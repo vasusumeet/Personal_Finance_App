@@ -1,0 +1,31 @@
+import express from "express";
+import mongoose from "mongoose";
+import {PORT, mongoDBURL} from "./config.js";
+import loginRoute from "./routes/loginRoute.js";
+import cors from 'cors';
+
+
+const app=express();
+app.use(cors());
+app.use(express.json());
+app.get('/',(request,response)=>{
+    console.log('request received on /');
+    return response.status(200).send('Personal Finance App')
+});
+
+app.use('/api/auth', loginRoute);
+mongoose
+  .connect(mongoDBURL, { useNewUrlParser: true, useUnifiedTopology: true })
+  .then(() => {
+    console.log('App is connected to Database');
+    app.listen(PORT, () => {
+      console.log(`App is listening to port: ${PORT}`);
+    });
+  })
+  .catch((error) => {
+    console.error('Database connection error:', error);
+process.exit(1);
+  });
+
+
+
