@@ -1,11 +1,13 @@
-import React, { useState } from 'react';
+import React, { useState, useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { UserContext } from '../UserContext';
 
 const Login = () => {
   const [identifier, setIdentifier] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
+  const { setUser } = useContext(UserContext);
   const navigate=useNavigate();
   const handleLogin = async () => {
     setError('');
@@ -24,6 +26,7 @@ const Login = () => {
 
       if (response.status === 200) {
         setSuccess('Login successful!');
+        setUser(data.user)
         navigate('/Dashboard');
         setError(data.message); 
       }

@@ -7,10 +7,12 @@ import Savings from './Pages/Savings'
 import Expenses from './Pages/Expenses'
 import Salary from './Pages/Salary'
 import SignUp from './Pages/SignUp'
+import { UserProvider } from './UserContext'
 
 
 const App = () => {
   return (
+    <UserProvider>
     <Routes>
       <Route path='/' element={<LandingPage/>}/>
       <Route path='/LoginPage' element={<LoginPage/>}/>
@@ -21,6 +23,7 @@ const App = () => {
       <Route path='/Savings' element={<Savings/>}/>
       
     </Routes>
+    </UserProvider>
   )
 }
 

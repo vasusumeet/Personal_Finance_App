@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+import React, { useState, useContext } from 'react';
+import { UserContext } from '../UserContext';
 import Navbar from '../Components/navbar';
 import { useNavigate } from 'react-router-dom';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, BarChart } from 'recharts';
@@ -6,8 +7,8 @@ import spinner from '../Components/spinner';
 
 const Dashboard = () => {
   const [loading, setLoading] = useState(false);
-
-  // Example data for charts
+  const { user } = useContext(UserContext);
+ 
   const expensesData = [
     { name: 'Jan', expenses: 400 },
     { name: 'Feb', expenses: 300 },
@@ -35,8 +36,13 @@ const Dashboard = () => {
   return (
     <div className="bg-gray-1 h-full w-full">
       <Navbar />
+      
       <div className="h-full w-full bg-gray-700 flex flex-wrap justify-around p-4">
         {/* Expenses Month-wise */}
+        <div>
+          <p>Welcome, {user.username}!</p>
+          <p>Email: {user.email}</p>
+        </div>
         <div className="bg-white rounded-lg shadow-md p-4 m-4 w-1/3">
           <h2 className="text-lg font-bold mb-4">Month-wise Expenses</h2>
           <ResponsiveContainer width="100%" height={300}>
