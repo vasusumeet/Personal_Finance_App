@@ -1,10 +1,13 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext} from 'react';
 import { Link, useLocation } from 'react-router-dom';
+import { UserContext } from '../UserContext';
+import { User, ChevronDown, ChevronUp } from 'lucide-react';
 
 function Navbar() {
   const location = useLocation(); 
   const [active, setActive] = useState('Dashboard'); 
-
+  const { user } = useContext(UserContext); 
+  const [isOpen, setIsOpen] = useState(false);
  
   useEffect(() => {
     const currentPath = location.pathname.replace('/', '') || 'Dashboard';
@@ -13,6 +16,9 @@ function Navbar() {
 
   const handleClick = (section) => {
     setActive(section);
+  };
+  const toggleDropdown = () => {
+    setIsOpen(!isOpen);
   };
 
   return (
@@ -48,6 +54,28 @@ function Navbar() {
           >
             Salary
           </Link>
+          <div className="relative">
+        <button
+          className="flex items-center gap-2 text-white"
+          onClick={toggleDropdown}
+        >
+          <User className="w-6 h-6" />
+          {isOpen ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
+        </button>
+
+        {isOpen && user && (
+          <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg py-2">
+            <p className="px-4 py-2 text-sm text-gray-800">
+              <strong>Username:</strong> {user.username}
+            </p>
+            <p className="px-4 py-2 text-sm text-gray-800">
+              <strong>Email:</strong> {user.email}
+            </p>
+          </div>
+        )}
+      </div><button>
+
+          </button>
         </div>
       </div>
     </nav>

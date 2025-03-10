@@ -1,15 +1,17 @@
 import Navbar from "../Components/navbar";
-import React, { useState } from "react";
+import React, { useState, useContext } from "react";
 import axios from "axios";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
+import { UserContext } from "../UserContext";
 
 const Expenses = () => {
+  const {user}=useContext(UserContext);
   const [formData, setFormData] = useState({
     label: "",
     amount: "",
     category: "Misc",
-    date: new Date(), // Default to current date
+    date: new Date(),
   });
 
   const handleChange = (e) => {
@@ -25,7 +27,7 @@ const Expenses = () => {
     e.preventDefault();
     try {
       const response = await axios.post("http://localhost:5555/userdata/:userId/expenses", {
-        ...formData,
+        formData,
         date: formData.date.toISOString().split("T")[0], // Format date as YYYY-MM-DD
       });
       alert("Expense added successfully!");
