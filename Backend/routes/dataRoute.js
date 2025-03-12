@@ -1,4 +1,5 @@
 import express from 'express';
+import mongoose from 'mongoose';
 
 import { UserData } from '../models/UserData.js'; 
 
@@ -27,12 +28,13 @@ dataRoute.post('/userdata', async (req, res) => {
 });
 
 // Add an expense
-dataRoute.post('/userdata/:userId/expenses', async (req, res) => {
+dataRoute.post('userdata /:userId/expenses', async (req, res) => {
     const { userId } = req.params;
     const { description, amount, date, category } = req.body;
 
     try {
-        const userData = await UserData.findOne({ userId});
+        // Convert userId to ObjectId
+        const userData = await UserData.findOne({ userId: new mongoose.Types.ObjectId(userId) });
 
         if (userData) {
             userData.expenses.push({ description, amount, date, category });

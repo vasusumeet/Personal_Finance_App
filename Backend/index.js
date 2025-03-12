@@ -15,7 +15,8 @@ app.get('/',(request,response)=>{
 });
 
 app.use('/api/auth', loginRoute);
-app.use('/userdata', dataRoute);
+app.use('/api', dataRoute);
+
 mongoose
   .connect(mongoDBURL, { useNewUrlParser: true, useUnifiedTopology: true })
   .then(() => {
