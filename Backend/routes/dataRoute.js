@@ -1,11 +1,11 @@
 import express from 'express';
-import mongoose from 'mongoose';
-import { UserData } from './models/UserData'; // Adjust the path as needed
 
-const router = express.Router();
+import { UserData } from '../models/UserData.js'; 
 
-// Create or update user data
-router.post('/userdata', async (req, res) => {
+const dataRoute = express.Router();
+
+
+dataRoute.post('/userdata', async (req, res) => {
     const { userId, salary, recurringSalary } = req.body;
 
     try {
@@ -27,12 +27,12 @@ router.post('/userdata', async (req, res) => {
 });
 
 // Add an expense
-router.post('/userdata/:userId/expenses', async (req, res) => {
+dataRoute.post('/userdata/:userId/expenses', async (req, res) => {
     const { userId } = req.params;
     const { description, amount, date, category } = req.body;
 
     try {
-        const userData = await UserData.findOne({ userId });
+        const userData = await UserData.findOne({ userId});
 
         if (userData) {
             userData.expenses.push({ description, amount, date, category });
@@ -47,7 +47,7 @@ router.post('/userdata/:userId/expenses', async (req, res) => {
 });
 
 // Add a savings goal
-router.post('/userdata/:userId/savings-goals', async (req, res) => {
+dataRoute.post('/userdata/:userId/savings-goals', async (req, res) => {
     const { userId } = req.params;
     const { goalName, targetAmount, currentAmount, deadline } = req.body;
 
@@ -67,7 +67,7 @@ router.post('/userdata/:userId/savings-goals', async (req, res) => {
 });
 
 // Get user data
-router.get('/userdata/:userId', async (req, res) => {
+dataRoute.get('/userdata/:userId', async (req, res) => {
     const { userId } = req.params;
 
     try {
@@ -84,7 +84,7 @@ router.get('/userdata/:userId', async (req, res) => {
 });
 
 // Update an expense
-router.put('/userdata/:userId/expenses/:expenseId', async (req, res) => {
+dataRoute.put('/userdata/:userId/expenses/:expenseId', async (req, res) => {
     const { userId, expenseId } = req.params;
     const { description, amount, date, category } = req.body;
 
@@ -113,7 +113,7 @@ router.put('/userdata/:userId/expenses/:expenseId', async (req, res) => {
 });
 
 // Delete an expense
-router.delete('/userdata/:userId/expenses/:expenseId', async (req, res) => {
+dataRoute.delete('/userdata/:userId/expenses/:expenseId', async (req, res) => {
     const { userId, expenseId } = req.params;
 
     try {
@@ -138,7 +138,7 @@ router.delete('/userdata/:userId/expenses/:expenseId', async (req, res) => {
 });
 
 // Update a savings goal
-router.put('/userdata/:userId/savings-goals/:goalId', async (req, res) => {
+dataRoute.put('/userdata/:userId/savings-goals/:goalId', async (req, res) => {
     const { userId, goalId } = req.params;
     const { goalName, targetAmount, currentAmount, deadline } = req.body;
 
@@ -167,7 +167,7 @@ router.put('/userdata/:userId/savings-goals/:goalId', async (req, res) => {
 });
 
 // Delete a savings goal
-router.delete('/userdata/:userId/savings-goals/:goalId', async (req, res) => {
+dataRoute.delete('/userdata/:userId/savings-goals/:goalId', async (req, res) => {
     const { userId, goalId } = req.params;
 
     try {
@@ -191,4 +191,4 @@ router.delete('/userdata/:userId/savings-goals/:goalId', async (req, res) => {
     }
 });
 
-export default router;
+export default dataRoute;

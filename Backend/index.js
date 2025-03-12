@@ -2,6 +2,7 @@ import express from "express";
 import mongoose from "mongoose";
 import {PORT, mongoDBURL} from "./config.js";
 import loginRoute from "./routes/loginRoute.js";
+import dataRoute from "./routes/dataRoute.js";
 import cors from 'cors';
 
 
@@ -14,6 +15,7 @@ app.get('/',(request,response)=>{
 });
 
 app.use('/api/auth', loginRoute);
+app.use('/userdata', dataRoute);
 mongoose
   .connect(mongoDBURL, { useNewUrlParser: true, useUnifiedTopology: true })
   .then(() => {

@@ -1,6 +1,6 @@
 import express from 'express';
 import { LoginData } from '../models/userLogin.js'; 
-import { UserData } from '../models/userData.js'; 
+import { UserData } from '../models/UserData.js';
 import bcrypt from 'bcrypt'; 
 
 const loginRoute = express.Router();
