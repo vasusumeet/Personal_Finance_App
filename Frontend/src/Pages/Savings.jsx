@@ -4,6 +4,8 @@ import axios from "axios";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import { UserContext } from "../UserContext";
+import SavingsProgress from "../Components/savingsprog";
+import BudgetOverview from "../Components/budgetover";
 
 const Savings = () => {
   const { user } = useContext(UserContext);
@@ -129,6 +131,8 @@ const Savings = () => {
           </button>
         </form>
       </div>
+      <SavingsProgress/>
+      <BudgetOverview/>
     </div>
   );
 };

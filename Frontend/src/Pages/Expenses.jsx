@@ -4,6 +4,7 @@ import axios from "axios";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import { UserContext } from "../UserContext";
+import ExpensesByCategory from "../Components/expensesbycat";
 
 const Expenses = () => {
   const { user } = useContext(UserContext);
@@ -121,6 +122,9 @@ const Expenses = () => {
             >
               <option value="Misc">Misc</option>
               <option value="Bills">Bills</option>
+              <option value="Food">Food</option>
+              <option value="Grocery">Grocery</option>
+              <option value="Random">Random</option>
             </select>
           </div>
           
@@ -132,6 +136,7 @@ const Expenses = () => {
           </button>
         </form>
       </div>
+      <ExpensesByCategory/>
     </div>
   );
 };
