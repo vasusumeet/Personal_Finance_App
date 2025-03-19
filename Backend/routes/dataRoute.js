@@ -38,8 +38,7 @@ dataRoute.post('/userdata/:userId/income', async (req, res) => {
 
     
         if (!userData.income) userData.income = [];
-        
-        // Add new income entry
+     
         userData.income.push({ description, amount, date, category });
 
         await userData.save();

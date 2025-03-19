@@ -35,21 +35,19 @@ const SalaryInfo = () => {
     const currentMonth = now.getMonth();
     const currentYear = now.getFullYear();
     
-    // Create date for this month's salary day
+
     let nextSalaryDate = new Date(currentYear, currentMonth, salaryData.recurringSalary);
-    
-    // If salary date has passed this month, look at next month
+
     if (now > nextSalaryDate) {
       if (currentMonth === 11) {
-        // If December, go to January of next year
+
         nextSalaryDate = new Date(currentYear + 1, 0, salaryData.recurringSalary);
       } else {
-        // Otherwise go to next month
+
         nextSalaryDate = new Date(currentYear, currentMonth + 1, salaryData.recurringSalary);
       }
     }
-    
-    // Calculate difference in days
+
     const differenceInTime = nextSalaryDate.getTime() - now.getTime();
     return Math.ceil(differenceInTime / (1000 * 3600 * 24));
   };

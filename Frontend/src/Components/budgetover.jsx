@@ -36,8 +36,16 @@ const BudgetOverview = () => {
           })
           .reduce((total, expense) => total + expense.amount, 0);
         
+        const monthlyIncome = userData.income
+          .filter(income => {
+            const incomeDate = new Date(income.date);
+            return incomeDate.getMonth() === currentMonth && 
+                   incomeDate.getFullYear() === currentYear;
+          })
+          .reduce((total, income) => total + income.amount, 0);
+        
         setBudgetData({
-          salary: userData.recurringSalary || userData.salary || 0,
+          salary: (userData.recurringSalary || userData.salary || 0) + monthlyIncome,
           totalExpenses: monthlyExpenses
         });
       } catch (error) {
