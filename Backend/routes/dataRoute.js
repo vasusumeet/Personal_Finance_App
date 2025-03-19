@@ -25,7 +25,73 @@ dataRoute.post('/userdata', async (req, res) => {
         res.status(500).json({ message: 'Error saving user data', error });
     }
 });
+dataRoute.post('/userdata/:userId/income', async (req, res) => {
+    const { userId } = req.params;
+    const { description, amount, date, category } = req.body;
 
+    try {
+        const userData = await UserData.findOne({ userId });
+
+        if (!userData) {
+            return res.status(404).json({ message: 'User data not found' });
+        }
+
+    
+        if (!userData.income) userData.income = [];
+        
+        // Add new income entry
+        userData.income.push({ description, amount, date, category });
+
+        await userData.save();
+        res.status(200).json(userData);
+    } catch (error) {
+        console.error('Error adding income:', error);
+        res.status(500).json({ message: 'Error adding income', error });
+    }
+});
+
+
+dataRoute.get('/userdata/:userId/income', async (req, res) => {
+    const { userId } = req.params;
+
+    try {
+        const userData = await UserData.findOne({ userId });
+
+        if (!userData) {
+            return res.status(404).json({ message: 'User data not found' });
+        }
+
+        res.status(200).json(userData.income || []);
+    } catch (error) {
+        console.error('Error retrieving income:', error);
+        res.status(500).json({ message: 'Error retrieving income', error });
+    }
+});
+
+
+dataRoute.delete('/userdata/:userId/income/:incomeId', async (req, res) => {
+    const { userId, incomeId } = req.params;
+
+    try {
+        const userData = await UserData.findOne({ userId });
+
+        if (!userData) {
+            return res.status(404).json({ message: 'User data not found' });
+        }
+
+        if (!userData.income) {
+            return res.status(404).json({ message: 'No income entries found' });
+        }
+
+        userData.income = userData.income.filter(inc => inc._id.toString() !== incomeId);
+        await userData.save();
+
+        res.status(200).json(userData);
+    } catch (error) {
+        console.error('Error deleting income:', error);
+        res.status(500).json({ message: 'Error deleting income', error });
+    }
+});
 
 dataRoute.post('/userdata/:userId/expenses', async (req, res) => {
     const { userId } = req.params;

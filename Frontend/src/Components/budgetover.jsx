@@ -91,21 +91,21 @@ const BudgetOverview = () => {
         <div className="flex justify-center items-center h-64">Loading data...</div>
       ) : (
         <>
-          <div className="h-48 mb-4">
+          <div className="mb-4">
             <Bar options={options} data={data} />
           </div>
           <div className="grid grid-cols-3 gap-4 text-center">
             <div className="p-2 bg-blue-50 rounded">
               <p className="text-sm text-gray-500">Income</p>
-              <p className="text-lg font-semibold">{budgetData.salary.toFixed(2)}</p>
+              <p className="text-lg font-semibold">₹{budgetData.salary.toFixed(2)}</p>
             </div>
             <div className="p-2 bg-red-50 rounded">
               <p className="text-sm text-gray-500">Expenses</p>
-              <p className="text-lg font-semibold">{budgetData.totalExpenses.toFixed(2)}</p>
+              <p className="text-lg font-semibold">₹{budgetData.totalExpenses.toFixed(2)}</p>
             </div>
             <div className={`p-2 ${remainingBudget >= 0 ? 'bg-green-50' : 'bg-red-50'} rounded`}>
               <p className="text-sm text-gray-500">Remaining</p>
-              <p className="text-lg font-semibold">{remainingBudget.toFixed(2)}</p>
+              <p className="text-lg font-semibold">₹{remainingBudget.toFixed(2)}</p>
             </div>
           </div>
           <div className="mt-4">

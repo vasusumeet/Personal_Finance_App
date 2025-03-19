@@ -85,9 +85,9 @@ const ExpensesByCategory = () => {
     <div className="bg-white p-4 rounded-lg shadow-md">
       <h3 className="text-lg font-semibold mb-4">Expense Distribution</h3>
       {loading ? (
-        <div className="flex justify-center items-center h-32">Loading data...</div>
+        <div className="flex justify-center items-center">Loading data...</div>
       ) : chartData.labels.length > 0 ? (
-        <div className="h-80 w-80">
+        <div className="">
           <Pie data={chartData} options={options} />
         </div>
       ) : (

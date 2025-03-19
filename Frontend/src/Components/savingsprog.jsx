@@ -78,7 +78,7 @@ const SavingsProgress = () => {
       {loading ? (
         <div className="flex justify-center items-center h-64">Loading data...</div>
       ) : savingsData.length > 0 ? (
-        <div className="h-64">
+        <div className="">
           <Bar options={options} data={data} />
         </div>
       ) : (

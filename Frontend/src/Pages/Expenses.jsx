@@ -136,7 +136,9 @@ const Expenses = () => {
           </button>
         </form>
       </div>
-      <ExpensesByCategory/>
+      <div className="h-80 w-80">
+         <ExpensesByCategory/>
+      </div>
     </div>
   );
 };

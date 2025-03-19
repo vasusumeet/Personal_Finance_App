@@ -117,13 +117,13 @@ const MonthlyExpensesTrend = () => {
     <div className="bg-white p-4 rounded-lg shadow-md">
       <h3 className="text-lg font-semibold mb-4">Monthly Expense Trend</h3>
       {loading ? (
-        <div className="flex justify-center items-center h-64">Loading data...</div>
+        <div className="flex justify-center items-center">Loading data...</div>
       ) : chartData.labels.length > 0 ? (
         <div className="h-64">
           <Line data={chartData} options={options} />
         </div>
       ) : (
-        <div className="flex justify-center items-center h-64">No expense data available</div>
+        <div className="flex justify-center items-center">No expense data available</div>
       )}
     </div>
   );
