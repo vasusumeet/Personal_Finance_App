@@ -9,7 +9,7 @@ import ExpensesByCategory from "../Components/expensesbycat";
 const Expenses = () => {
   const { user } = useContext(UserContext);
   const [formData, setFormData] = useState({
-    description: "", // Changed from label to match API
+    description: "",
     amount: "",
     category: "Misc",
     date: new Date(),
@@ -27,21 +27,21 @@ const Expenses = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     
-    // Make sure we have a user ID
+
     if (!user || !user._id) {
       alert("You must be logged in to add expenses");
       return;
     }
     
     try {
-      // Use the actual user ID from context
+      
       const response = await axios.post(
         `http://localhost:5555/api/userdata/${user._id}/expenses`, 
         {
-          description: formData.description, // Match the API field names
+          description: formData.description, 
           amount: parseFloat(formData.amount),
           category: formData.category,
-          date: formData.date.toISOString().split("T")[0], // Format date as YYYY-MM-DD
+          date: formData.date.toISOString().split("T")[0],
         }
       );
       
@@ -138,6 +138,9 @@ const Expenses = () => {
       </div>
       <div className="h-80 w-80">
          <ExpensesByCategory/>
+      <div>
+          Expenses History
+      </div>
       </div>
     </div>
   );

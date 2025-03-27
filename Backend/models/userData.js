@@ -57,7 +57,6 @@ const SavingsGoalSchema = new mongoose.Schema({
     },
 });
 
-// Define the User Data schema
 const UserDataSchema = new mongoose.Schema(
     {
         userId: {
@@ -76,8 +75,9 @@ const UserDataSchema = new mongoose.Schema(
             type: Number,
             required: true,
         },
+        
         expenses: [ExpenseSchema],
-        income: [IncomeSchema], // New field for one-time income entries
+        income: [IncomeSchema], 
         savingsGoals: [SavingsGoalSchema],
     },
     {

@@ -4,7 +4,7 @@ import { UserData } from '../models/UserData.js';
 
 const dataRoute = express.Router();
 
-
+//Fetch User Data
 dataRoute.post('/userdata', async (req, res) => {
     const { userId, salary, recurringSalary } = req.body;
 
@@ -25,6 +25,8 @@ dataRoute.post('/userdata', async (req, res) => {
         res.status(500).json({ message: 'Error saving user data', error });
     }
 });
+
+//Post Income
 dataRoute.post('/userdata/:userId/income', async (req, res) => {
     const { userId } = req.params;
     const { description, amount, date, category } = req.body;
@@ -49,7 +51,7 @@ dataRoute.post('/userdata/:userId/income', async (req, res) => {
     }
 });
 
-
+//Get Income Data
 dataRoute.get('/userdata/:userId/income', async (req, res) => {
     const { userId } = req.params;
 
@@ -67,7 +69,7 @@ dataRoute.get('/userdata/:userId/income', async (req, res) => {
     }
 });
 
-
+//Delete Income 
 dataRoute.delete('/userdata/:userId/income/:incomeId', async (req, res) => {
     const { userId, incomeId } = req.params;
 
@@ -91,7 +93,7 @@ dataRoute.delete('/userdata/:userId/income/:incomeId', async (req, res) => {
         res.status(500).json({ message: 'Error deleting income', error });
     }
 });
-
+//Add Expenses
 dataRoute.post('/userdata/:userId/expenses', async (req, res) => {
     const { userId } = req.params;
     const { description, amount, date, category } = req.body;
@@ -113,7 +115,7 @@ dataRoute.post('/userdata/:userId/expenses', async (req, res) => {
         res.status(500).json({ message: 'Error adding expense', error });
     }
 });
-
+//Add Savings Goals
 dataRoute.post('/userdata/:userId/savings-goals', async (req, res) => {
     const { userId } = req.params;
     const { goalName, targetAmount, currentAmount, deadline } = req.body;
@@ -136,7 +138,7 @@ dataRoute.post('/userdata/:userId/savings-goals', async (req, res) => {
     }
 });
 
-
+//Fetch user data
 dataRoute.get('/userdata/:userId', async (req, res) => {
     const { userId } = req.params;
 
@@ -154,7 +156,7 @@ dataRoute.get('/userdata/:userId', async (req, res) => {
     }
 });
 
-
+//Update Expense
 dataRoute.put('/userdata/:userId/expenses/:expenseId', async (req, res) => {
     const { userId, expenseId } = req.params;
     const { description, amount, date, category } = req.body;
@@ -183,7 +185,7 @@ dataRoute.put('/userdata/:userId/expenses/:expenseId', async (req, res) => {
         res.status(500).json({ message: 'Error updating expense', error });
     }
 });
-
+//Delete Expense
 dataRoute.delete('/userdata/:userId/expenses/:expenseId', async (req, res) => {
     const { userId, expenseId } = req.params;
 
@@ -204,7 +206,7 @@ dataRoute.delete('/userdata/:userId/expenses/:expenseId', async (req, res) => {
     }
 });
 
-
+//Update saving goal data  
 dataRoute.put('/userdata/:userId/savings-goals/:goalId', async (req, res) => {
     const { userId, goalId } = req.params;
     const { goalName, targetAmount, currentAmount, deadline, deductFromSalary } = req.body;
@@ -265,6 +267,89 @@ dataRoute.delete('/userdata/:userId/savings-goals/:goalId', async (req, res) => 
     } catch (error) {
         console.error('Error deleting savings goal:', error);
         res.status(500).json({ message: 'Error deleting savings goal', error });
+    }
+});
+dataRoute.post('/userdata/:userId/savings-goals/:goalId/contribute', async (req, res) => {
+    const { userId, goalId } = req.params;
+    const { amount } = req.body;
+
+    try {
+        const userData = await UserData.findOne({ userId });
+
+        if (!userData) {
+            return res.status(404).json({ message: 'User data not found' });
+        }
+
+        const goal = userData.savingsGoals.id(goalId);
+        if (!goal) {
+            return res.status(404).json({ message: 'Savings goal not found' });
+        }
+
+        // Check if user has enough salary to contribute
+        if (userData.recurringSalary >= amount) {
+            userData.recurringSalary -= amount;
+            goal.currentAmount += amount;
+        } else if (userData.salary >= amount) {
+            userData.salary -= amount;
+            goal.currentAmount += amount;
+        } else {
+            return res.status(400).json({ message: 'Insufficient funds' });
+        }
+
+        await userData.save();
+        res.status(200).json(userData);
+    } catch (error) {
+        console.error('Error contributing to savings goal:', error);
+        res.status(500).json({ message: 'Error contributing to savings goal', error });
+    }
+});
+
+// New route to handle end-of-month savings transfer
+dataRoute.post('/userdata/:userId/end-of-month-savings', async (req, res) => {
+    const { userId } = req.params;
+
+    try {
+        const userData = await UserData.findOne({ userId });
+
+        if (!userData) {
+            return res.status(404).json({ message: 'User data not found' });
+        }
+
+        // Calculate total expenses for the month
+        const totalExpenses = userData.expenses ? 
+            userData.expenses.reduce((sum, expense) => sum + expense.amount, 0) : 0;
+
+        // Calculate remaining salary after expenses
+        let remainingSalary = userData.salary - totalExpenses;
+
+        // If recurring salary exists, add it
+        if (userData.recurringSalary) {
+            remainingSalary += userData.recurringSalary;
+        }
+
+        // Transfer remaining salary to a general savings category
+        if (!userData.savings) {
+            userData.savings = [];
+        }
+
+        userData.savings.push({
+            amount: remainingSalary,
+            date: new Date(),
+            description: 'End of month savings transfer'
+        });
+
+        // Reset salary and recurring salary
+        userData.salary = 0;
+        userData.recurringSalary = 0;
+
+        // Clear monthly expenses
+        userData.expenses = [];
+
+        await userData.save();
+        res.status(200).json(userData);
+    } catch (error) {
+        console.error('Error processing end-of-month savings:', error);
+        res.status(500).json({ message: 'Error processing end-of-month savings', error });
     }
 });
 
