@@ -207,32 +207,46 @@ dataRoute.delete('/userdata/:userId/expenses/:expenseId', async (req, res) => {
 
 dataRoute.put('/userdata/:userId/savings-goals/:goalId', async (req, res) => {
     const { userId, goalId } = req.params;
-    const { goalName, targetAmount, currentAmount, deadline } = req.body;
-
+    const { goalName, targetAmount, currentAmount, deadline, deductFromSalary } = req.body;
+  
     try {
-        const userData = await UserData.findOne({ userId });
+      const userData = await UserData.findOne({ userId });
+  
+      if (!userData) {
+        return res.status(404).json({ message: 'User data not found' });
+      }
+  
+      const goal = userData.savingsGoals.id(goalId);
+      if (!goal) {
+        return res.status(404).json({ message: 'Savings goal not found' });
+      }
 
-        if (!userData) {
-            return res.status(404).json({ message: 'User data not found' });
+      if (goalName) goal.goalName = goalName;
+      if (targetAmount) goal.targetAmount = targetAmount;
+      if (deadline) goal.deadline = deadline;
+  
+ 
+      if (currentAmount) {
+        goal.currentAmount += currentAmount;
+      }
+  
+      if (deductFromSalary) {
+     
+        if (userData.recurringSalary >= currentAmount) {
+          userData.recurringSalary -= currentAmount;
+        } else {
+         
+          userData.salary -= currentAmount;
         }
-
-        const goal = userData.savingsGoals.id(goalId);
-        if (!goal) {
-            return res.status(404).json({ message: 'Savings goal not found' });
-        }
-
-        goal.goalName = goalName;
-        goal.targetAmount = targetAmount;
-        goal.currentAmount = currentAmount;
-        goal.deadline = deadline;
-
-        await userData.save();
-        res.status(200).json(userData);
+      }
+  
+      await userData.save();
+      res.status(200).json(userData);
     } catch (error) {
-        console.error('Error updating savings goal:', error);
-        res.status(500).json({ message: 'Error updating savings goal', error });
+      console.error('Error updating savings goal:', error);
+      res.status(500).json({ message: 'Error updating savings goal', error });
     }
-});
+  });
 
 dataRoute.delete('/userdata/:userId/savings-goals/:goalId', async (req, res) => {
     const { userId, goalId } = req.params;
