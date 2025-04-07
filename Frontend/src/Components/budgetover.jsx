@@ -87,7 +87,7 @@ const BudgetOverview = () => {
     ],
   };
 
-  // Calculate remaining budget
+  
   const remainingBudget = budgetData.salary - budgetData.totalExpenses;
   const percentUsed = budgetData.salary > 0 ? 
     Math.round((budgetData.totalExpenses / budgetData.salary) * 100) : 0;

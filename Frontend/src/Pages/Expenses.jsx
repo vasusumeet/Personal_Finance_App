@@ -1,10 +1,11 @@
-import Navbar from "../Components/navbar";
-import React, { useState, useContext } from "react";
+import React, { useState, useContext, useEffect } from "react";
 import axios from "axios";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import { UserContext } from "../UserContext";
+import Navbar from "../Components/navbar";
 import ExpensesByCategory from "../Components/expensesbycat";
+import ExpenseHistory from "../Components/expenseHistory";
 
 const Expenses = () => {
   const { user } = useContext(UserContext);
@@ -17,16 +18,15 @@ const Expenses = () => {
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData({ ...formData, [name]: value }); // Fixed spread operator
+    setFormData({ ...formData, [name]: value });
   };
 
   const handleDateChange = (date) => {
-    setFormData({ ...formData, date }); // Fixed spread operator
+    setFormData({ ...formData, date });
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
 
     if (!user || !user._id) {
       alert("You must be logged in to add expenses");
@@ -34,7 +34,6 @@ const Expenses = () => {
     }
     
     try {
-      
       const response = await axios.post(
         `http://localhost:5555/api/userdata/${user._id}/expenses`, 
         {
@@ -136,11 +135,16 @@ const Expenses = () => {
           </button>
         </form>
       </div>
-      <div className="h-80 w-80">
-         <ExpensesByCategory/>
-      <div>
-          Expenses History
-      </div>
+      
+      <div className="max-w-4xl mx-auto mt-6">
+        <div className="grid md:grid-cols-2 gap-6">
+          <div>
+            <ExpensesByCategory/>
+          </div>
+          <div>
+            {user && user._id && <ExpenseHistory userId={user._id} />}
+          </div>
+        </div>
       </div>
     </div>
   );

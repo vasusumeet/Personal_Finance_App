@@ -69,6 +69,7 @@ dataRoute.get('/userdata/:userId/income', async (req, res) => {
     }
 });
 
+
 //Delete Income 
 dataRoute.delete('/userdata/:userId/income/:incomeId', async (req, res) => {
     const { userId, incomeId } = req.params;
@@ -93,7 +94,7 @@ dataRoute.delete('/userdata/:userId/income/:incomeId', async (req, res) => {
         res.status(500).json({ message: 'Error deleting income', error });
     }
 });
-//Add Expenses
+
 dataRoute.post('/userdata/:userId/expenses', async (req, res) => {
     const { userId } = req.params;
     const { description, amount, date, category } = req.body;
@@ -115,7 +116,7 @@ dataRoute.post('/userdata/:userId/expenses', async (req, res) => {
         res.status(500).json({ message: 'Error adding expense', error });
     }
 });
-//Add Savings Goals
+// Add Savings Goal - Creates a new savings target
 dataRoute.post('/userdata/:userId/savings-goals', async (req, res) => {
     const { userId } = req.params;
     const { goalName, targetAmount, currentAmount, deadline } = req.body;
@@ -138,7 +139,7 @@ dataRoute.post('/userdata/:userId/savings-goals', async (req, res) => {
     }
 });
 
-//Fetch user data
+// Fetch User Data - Retrieves all user data for a specific user ID
 dataRoute.get('/userdata/:userId', async (req, res) => {
     const { userId } = req.params;
 
@@ -185,7 +186,7 @@ dataRoute.put('/userdata/:userId/expenses/:expenseId', async (req, res) => {
         res.status(500).json({ message: 'Error updating expense', error });
     }
 });
-//Delete Expense
+
 dataRoute.delete('/userdata/:userId/expenses/:expenseId', async (req, res) => {
     const { userId, expenseId } = req.params;
 
@@ -206,7 +207,7 @@ dataRoute.delete('/userdata/:userId/expenses/:expenseId', async (req, res) => {
     }
 });
 
-//Update saving goal data  
+// Update Savings Goal - Modifies an existing savings goal
 dataRoute.put('/userdata/:userId/savings-goals/:goalId', async (req, res) => {
     const { userId, goalId } = req.params;
     const { goalName, targetAmount, currentAmount, deadline, deductFromSalary } = req.body;
@@ -249,7 +250,7 @@ dataRoute.put('/userdata/:userId/savings-goals/:goalId', async (req, res) => {
       res.status(500).json({ message: 'Error updating savings goal', error });
     }
   });
-
+// Delete Savings Goal - Removes a savings goal
 dataRoute.delete('/userdata/:userId/savings-goals/:goalId', async (req, res) => {
     const { userId, goalId } = req.params;
 
@@ -269,6 +270,7 @@ dataRoute.delete('/userdata/:userId/savings-goals/:goalId', async (req, res) => 
         res.status(500).json({ message: 'Error deleting savings goal', error });
     }
 });
+// Contribute to Savings Goal - Adds money to a specific savings goal
 dataRoute.post('/userdata/:userId/savings-goals/:goalId/contribute', async (req, res) => {
     const { userId, goalId } = req.params;
     const { amount } = req.body;
@@ -304,7 +306,8 @@ dataRoute.post('/userdata/:userId/savings-goals/:goalId/contribute', async (req,
     }
 });
 
-// New route to handle end-of-month savings transfer
+
+// End-of-Month Savings - Processes remaining salary into savings at month end
 dataRoute.post('/userdata/:userId/end-of-month-savings', async (req, res) => {
     const { userId } = req.params;
 
@@ -352,5 +355,41 @@ dataRoute.post('/userdata/:userId/end-of-month-savings', async (req, res) => {
         res.status(500).json({ message: 'Error processing end-of-month savings', error });
     }
 });
+// Fetch Expenses - Gets paginated list of user expenses
+dataRoute.get('/api/userdata/:userId/expenses', async (req, res) => {
+    const userId = req.params.userId;
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 5;
+    const skip = (page - 1) * limit;
+  
+    try {
+      // Find the user data first
+      const userData = await UserData.findOne({ userId });
+      
+      if (!userData) {
+        return res.status(404).json({ message: 'User data not found' });
+      }
+      
+      // Get expenses from the userData object
+      const expenses = userData.expenses || [];
+      const total = expenses.length;
+      
+      // Manual pagination since we're working with an array
+      const paginatedExpenses = expenses
+        .sort((a, b) => new Date(b.date) - new Date(a.date))
+        .slice(skip, skip + limit);
+  
+      res.json({
+        expenses: paginatedExpenses,
+        total,
+        page,
+        totalPages: Math.ceil(total / limit)
+      });
+    } catch (error) {
+      console.error('Error fetching expenses:', error);
+      res.status(500).json({ message: 'Error fetching expenses' });
+    }
+});
+
 
 export default dataRoute;
