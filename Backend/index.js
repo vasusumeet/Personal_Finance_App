@@ -21,9 +21,6 @@ mongoose
   .connect(mongoDBURL, { useNewUrlParser: true, useUnifiedTopology: true })
   .then(() => {
     console.log('App is connected to Database');
-    app.listen(PORT, () => {
-      console.log(`App is listening to port: ${PORT}`);
-    });
   })
   .catch((error) => {
     console.error('Database connection error:', error);
@@ -31,6 +28,6 @@ process.exit(1);
   });
 
 
-  export default app;
+export default app;
 
 
