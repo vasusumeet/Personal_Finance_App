@@ -390,6 +390,41 @@ dataRoute.get('/userdata/:userId/expensehis', async (req, res) => {
       res.status(500).json({ message: 'Error fetching expenses' });
     }
 });
+// Fetch Income - Gets paginated list of users Income history
+dataRoute.get('/userdata/:userId/incomehis', async (req, res) => {
+    const userId = req.params.userId;
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 5;
+    const skip = (page - 1) * limit;
+  
+    try {
+     
+      const userData = await UserData.findOne({ userId });
+      
+      if (!userData) {
+        return res.status(404).json({ message: 'User data not found' });
+      }
+      
+      // Get expenses from the userData object
+      const income = userData.income || [];
+      const total = income.length;
+      
+      // Manual pagination since we're working with an array
+      const paginatedIncome = income
+        .sort((a, b) => new Date(b.date) - new Date(a.date))
+        .slice(skip, skip + limit);
+  
+      res.json({
+        income: paginatedIncome,
+        total,
+        page,
+        totalPages: Math.ceil(total / limit)
+      });
+    } catch (error) {
+      console.error('Error fetching Income:', error);
+      res.status(500).json({ message: 'Error fetching Income' });
+    }
+});
 
 
 export default dataRoute;
