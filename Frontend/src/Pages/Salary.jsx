@@ -291,9 +291,6 @@ const Salary = () => {
       <div>
             {user && user._id && <IncomeHistory userId={user._id} />}
       </div>
-      <div>
-                  {user && user._id && <IncomeHistory userId={user._id} />}
-      </div>
     </div>
   );
 };
