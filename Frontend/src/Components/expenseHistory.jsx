@@ -11,7 +11,7 @@ const ExpenseHistory = ({ userId }) => {
     const fetchExpenses = async () => {
       try {
         const response = await axios.get(
-          `http://localhost:5555/api/userdata/${userId}/expenses`,
+          `http://localhost:5555/api/userdata/${userId}/expensehis`,
           {
             params: {
               page: currentPage,
@@ -37,10 +37,50 @@ const ExpenseHistory = ({ userId }) => {
     setCurrentPage(newPage);
   };
 
+  // Delete Expense Handler
+  const handleDeleteExp = async (expenseId) => {
+    if (!window.confirm("Are you sure you want to delete this expense?")) return;
+
+    try {
+      // API here
+      // Example:
+      // await axios.delete(`/your-delete-expense-api/${expenseId}`);
+      // After successful delete, update the state:
+      setExpense((prev) => prev.filter((exp) => exp._id !== expenseId));
+      alert("Expense deleted successfully!");
+    } catch (error) {
+      console.error("Error deleting expense:", error);
+      alert("Failed to delete expense.");
+    }
+  };
+
+  // Edit Expense Handler
+  const handleEditExp = async (exp) => {
+    // For demonstration, prompt for a new description
+    const newDescription = window.prompt("Edit description:", exp.description);
+    if (newDescription === null) return;
+
+    try {
+      // API here
+      // Example:
+      // const response = await axios.put(`/your-edit-expense-api/${exp._id}`, { ...exp, description: newDescription });
+      // After successful edit, update the state:
+      setExpense((prev) =>
+        prev.map((e) =>
+          e._id === exp._id ? { ...e, description: newDescription } : e
+        )
+      );
+      alert("Expense updated successfully!");
+    } catch (error) {
+      console.error("Error editing expense:", error);
+      alert("Failed to edit expense.");
+    }
+  };
+
   return (
-    <div className="mt-8 bg-white shadow-md rounded-lg p-6">
+    <div className="mt-8 bg-white shadow-md rounded-lg p-4">
       <h3 className="text-xl font-semibold text-gray-700 mb-4">Expense History</h3>
-      <div className="overflow-x-auto">
+      <div>
         <table className="w-full border-collapse">
           <thead>
             <tr className="bg-gray-100">
@@ -48,12 +88,13 @@ const ExpenseHistory = ({ userId }) => {
               <th className="p-3 text-left border">Description</th>
               <th className="p-3 text-left border">Category</th>
               <th className="p-3 text-right border">Amount</th>
+              <th className="p-3 text-right border">Action</th>
             </tr>
           </thead>
           <tbody>
             {expense && expense.length > 0 ? (
               expense.map((exp) => (
-                <tr key={exp._id} className="border-b hover:bg-gray-50">
+                <tr key={exp._id} className="border-b hover:bg-gray-100">
                   <td className="p-3 border">
                     {new Date(exp.date).toLocaleDateString()}
                   </td>
@@ -62,11 +103,25 @@ const ExpenseHistory = ({ userId }) => {
                   <td className="p-3 text-right border">
                     {exp.amount.toFixed(2)}
                   </td>
+                  <td className="p-2 border">
+                    <button
+                      onClick={() => handleDeleteExp(exp._id)}
+                      className="px-2 py-1.5 bg-red-700 text-white rounded hover:opacity-50"
+                    >
+                      Delete
+                    </button>
+                    <button
+                      onClick={() => handleEditExp(exp)}
+                      className="px-4 py-1.5 bg-blue-500 text-white rounded hover:opacity-50 ml-2"
+                    >
+                      Edit
+                    </button>
+                  </td>
                 </tr>
               ))
             ) : (
               <tr>
-                <td colSpan="4" className="p-3 text-center">
+                <td colSpan="5" className="p-3 text-center">
                   No expenses found
                 </td>
               </tr>
@@ -74,7 +129,7 @@ const ExpenseHistory = ({ userId }) => {
           </tbody>
         </table>
       </div>
-      
+
       {/* Pagination Controls */}
       <div className="flex justify-center items-center mt-4 space-x-2">
         <button

@@ -63,7 +63,7 @@ const Expenses = () => {
   return (
     <div>
       <Navbar/>
-      <div className="max-w-4xl mx-auto mt-10 p-6 bg-white shadow-md rounded-lg">
+      <div className="max-w-4xl mt-10 p-6 bg-white shadow-md rounded-lg">
         <h2 className="text-2xl font-semibold text-gray-700 mb-6">Create Expense</h2>
         <form onSubmit={handleSubmit} className="space-y-6">
           <div className="grid grid-cols-4 gap-4 items-center">
@@ -136,12 +136,12 @@ const Expenses = () => {
         </form>
       </div>
       
-      <div className="max-w-4xl mx-auto mt-6">
+      <div className="max-w-5xl mx-auto mt-6">
         <div className="grid md:grid-cols-2 gap-6">
           <div>
             <ExpensesByCategory/>
           </div>
-          <div>
+          <div className="">
             {user && user._id && <ExpenseHistory userId={user._id} />}
           </div>
         </div>

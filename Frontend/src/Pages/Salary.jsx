@@ -4,6 +4,7 @@ import axios from "axios";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import { UserContext } from "../UserContext";
+import IncomeHistory from "../Components/incomeHistory";
 
 const Salary = () => {
   const { user } = useContext(UserContext);
@@ -285,7 +286,10 @@ const Salary = () => {
               Add One-time Income
             </button>
           </form>
-        </div>
+        </div> 
+      </div>
+      <div>
+            {user && user._id && <IncomeHistory userId={user._id} />}
       </div>
     </div>
   );
