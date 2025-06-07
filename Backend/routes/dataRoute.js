@@ -356,7 +356,7 @@ dataRoute.post('/userdata/:userId/end-of-month-savings', async (req, res) => {
     }
 });
 // Fetch Expenses - Gets paginated list of user expenses
-dataRoute.get('/api/userdata/:userId/expenses', async (req, res) => {
+dataRoute.get('/userdata/:userId/expensehis', async (req, res) => {
     const userId = req.params.userId;
     const page = parseInt(req.query.page) || 1;
     const limit = parseInt(req.query.limit) || 5;
