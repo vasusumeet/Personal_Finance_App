@@ -8,8 +8,10 @@ import cors from 'cors';
 dotenv.config();
 
 const app = express();
+
 const allowedOrigins = [
-  'https://personal-finance-app-front-gvvglipfj-vasu-sumeet-seths-projects.vercel.app', 
+  'https://your-frontend-url.vercel.app', // Replace with your deployed frontend URL
+  'http://localhost:3000'
 ];
 app.use(cors({
   origin: allowedOrigins,
@@ -22,10 +24,11 @@ app.get('/', (req, res) => {
   return res.status(200).send('Personal Finance App');
 });
 
+app.get('/health', (req, res) => res.status(200).send('OK'));
+
 app.use('/api/auth', loginRoute);
 app.use('/api', dataRoute);
 
-// Use environment variables for config
 const PORT = process.env.PORT || 5000;
 const mongoDBURL = process.env.mongoDBURL;
 
