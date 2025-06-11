@@ -8,14 +8,7 @@ import {PORT, mongoDBURL} from "./config.js";
 
 const app=express();
 app.use(cors());
-
 app.use(express.json());
-
-
-app.use('/api/auth', loginRoute);
-app.use('/api', dataRoute);
-
-
 app.get('/',(request,response)=>{
     console.log('request received on /');
     return response.status(200).send('Personal Finance App')
