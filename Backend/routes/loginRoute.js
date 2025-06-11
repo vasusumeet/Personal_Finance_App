@@ -18,10 +18,23 @@ loginRoute.post('/signup', async (request, response) => {
     const newUser = new LoginData({ username, email, password: hashedPassword });
     await newUser.save();
 
-    const newUserData = new UserData({ userId: newUser._id, username:newUser.username, salary: 0, recurringSalary: 0, expenses: [], savingsGoals: [] });
+    const newUserData = new UserData({ userId: newUser._id, username: newUser.username, salary: 0, recurringSalary: 0, expenses: [], savingsGoals: [] });
     await newUserData.save();
 
-    return response.status(201).send({ message: 'User created successfully' });
+    // Do not send password in response
+    const userResponse = {
+      id: newUser._id,
+      username: newUser.username,
+      email: newUser.email,
+      userData: {
+        salary: newUserData.salary,
+        recurringSalary: newUserData.recurringSalary,
+        expenses: newUserData.expenses,
+        savingsGoals: newUserData.savingsGoals
+      }
+    };
+
+    return response.status(201).send({ message: 'User created successfully', user: userResponse });
   } catch (error) {
     console.log(error);
     return response.status(500).send({ message: error.message });
