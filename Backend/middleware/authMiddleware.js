@@ -2,6 +2,11 @@ import jwt from 'jsonwebtoken';
 import { jwtSecret } from '../config.js'; // Adjust the path if needed
 
 const authenticate = (req, res, next) => {
+  // Skip authentication for OPTIONS requests (CORS preflight)
+  if (req.method === 'OPTIONS') {
+    return next();
+  }
+
   const authHeader = req.headers['authorization'];
   if (!authHeader) {
     return res.status(401).json({ message: 'Authorization token is required.' });
@@ -23,4 +28,3 @@ const authenticate = (req, res, next) => {
 };
 
 export default authenticate;
-
