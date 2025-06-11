@@ -4,8 +4,8 @@ import dotenv from "dotenv";
 import loginRoute from "./routes/loginRoute.js";
 import dataRoute from "./routes/dataRoute.js";
 import cors from 'cors';
-import PORT from "./config.js";
-import mongoDBURL from "./config.js";
+import {PORT} from "./config.js";
+import {mongoDBURL} from "./config.js";
 
 const app=express();
 app.use(cors());
