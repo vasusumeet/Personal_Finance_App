@@ -7,14 +7,27 @@ import cors from 'cors';
 
 dotenv.config();
 
-const app = express();
+// Use uppercase and underscores for environment variables (recommended for Vercel)
+const PORT = process.env.PORT || 5000;
+const mongoDBURL = process.env.mongoDBURL; // Make sure this matches your Vercel env var exactly!
 
 const allowedOrigins = [
-  'https://personal-finance-app-front.vercel.app', // Replace with your deployed frontend URL
+  'https://personal-finance-app-front.vercel.app', // Your deployed frontend URL
+  'http://localhost:3000', // For local development/testing
 ];
+
+// CORS middleware: always before routes, allow credentials, allow all standard methods
 app.use(cors({
   origin: allowedOrigins,
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization'],
 }));
+
+// Ensure preflight requests are handled
+app.options('*', cors());
+
+const app = express();
 app.use(express.json());
 
 app.get('/', (req, res) => {
@@ -26,9 +39,6 @@ app.get('/health', (req, res) => res.status(200).send('OK'));
 
 app.use('/api/auth', loginRoute);
 app.use('/api', dataRoute);
-
-const PORT = process.env.PORT || 5000;
-const mongoDBURL = process.env.mongoDBURL;
 
 mongoose
   .connect(mongoDBURL, { useNewUrlParser: true, useUnifiedTopology: true })
