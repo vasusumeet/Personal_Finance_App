@@ -14,6 +14,9 @@ app.get('/',(request,response)=>{
     return response.status(200).send('Personal Finance App')
 });
 
+app.get('/health', (req, res) => {
+  res.status(200).json({ status: 'OK', timestamp: new Date().toISOString() });
+});
 
 
 
