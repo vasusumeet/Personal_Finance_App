@@ -10,12 +10,10 @@ dotenv.config();
 const app = express();
 
 const allowedOrigins = [
-  'https://personal-finance-app-front.vercel.app/login', // Replace with your deployed frontend URL
-  'http://localhost:3000'
+  'https://personal-finance-app-front.vercel.app', // Replace with your deployed frontend URL
 ];
 app.use(cors({
   origin: allowedOrigins,
-
 }));
 app.use(express.json());
 
