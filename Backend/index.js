@@ -7,12 +7,7 @@ import cors from 'cors';
 import {PORT, mongoDBURL} from "./config.js";
 
 const app=express();
-app.use(cors({
-  origin: 'https://personal-finance-app-front.vercel.app',
-  credentials: true,
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization']
-}));
+app.use(cors());
 
 app.use(express.json());
 
