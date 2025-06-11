@@ -13,6 +13,7 @@ const IncomeList = () => {
     }
   }, [user]);
 
+  
   const fetchIncomeData = async () => {
     try {
       setLoading(true);
