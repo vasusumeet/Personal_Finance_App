@@ -23,7 +23,7 @@ const ExpenseHistory = ({ userId }) => {
     const fetchExpenses = async () => {
       try {
         const response = await axios.get(
-          `http://localhost:5555/api/userdata/${userId}/expensehis`,
+          `https://personal-finance-app-weld.vercel.app/api/userdata/${userId}/expensehis`,
           {
             params: {
               page: currentPage,
@@ -53,7 +53,7 @@ const ExpenseHistory = ({ userId }) => {
   const handleDeleteExp = async () => {
     try {
       await axios.delete(
-        `http://localhost:5555/api/userdata/${userId}/expenses/${pendingDeleteId}/deleteexp`,
+        `https://personal-finance-app-weld.vercel.app/api/userdata/${userId}/expenses/${pendingDeleteId}/deleteexp`,
         { headers: getAuthHeader() }
       );
       setExpense((prev) => prev.filter((exp) => exp._id !== pendingDeleteId));
@@ -78,7 +78,7 @@ const ExpenseHistory = ({ userId }) => {
   const handleEditExp = async (form) => {
     try {
       await axios.put(
-        `http://localhost:5555/api/userdata/${userId}/expenses/${pendingEditExp._id}/editexp`,
+        `https://personal-finance-app-weld.vercel.app/api/userdata/${userId}/expenses/${pendingEditExp._id}/editexp`,
         {
           ...pendingEditExp,
           ...form,

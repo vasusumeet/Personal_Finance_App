@@ -25,7 +25,7 @@ const SignUp = () => {
     setLoading(true);
 
     axios
-      .post('http://localhost:5555/api/auth/signup', data)
+      .post('https://personal-finance-app-weld.vercel.app/api/auth/signup', data)
       .then((response) => {
         setLoading(false);
         if (response.status === 201) {

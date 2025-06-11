@@ -42,7 +42,7 @@ const Expenses = () => {
 
     try {
       const response = await axios.post(
-        `http://localhost:5555/api/userdata/${user.id}/expenses`, 
+        `https://personal-finance-app-weld.vercel.app/api/userdata/${user.id}/expenses`, 
         {
           description: formData.description, 
           amount: parseFloat(formData.amount),
