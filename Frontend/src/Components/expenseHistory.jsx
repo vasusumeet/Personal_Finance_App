@@ -7,6 +7,12 @@ const ExpenseHistory = ({ userId }) => {
   const [totalPages, setTotalPages] = useState(1);
   const itemsPerPage = 5;
 
+  // Helper to get JWT token
+  const getAuthHeader = () => {
+    const token = localStorage.getItem('token');
+    return token ? { Authorization: `Bearer ${token}` } : {};
+  };
+
   useEffect(() => {
     const fetchExpenses = async () => {
       try {
@@ -16,7 +22,8 @@ const ExpenseHistory = ({ userId }) => {
             params: {
               page: currentPage,
               limit: itemsPerPage
-            }
+            },
+            headers: getAuthHeader()
           }
         );
 
@@ -42,10 +49,11 @@ const ExpenseHistory = ({ userId }) => {
     if (!window.confirm("Are you sure you want to delete this expense?")) return;
 
     try {
-      // API here
-      // Example:
-      // await axios.delete(`/your-delete-expense-api/${expenseId}`);
-      // After successful delete, update the state:
+      // Send DELETE request with JWT header
+      await axios.delete(
+        `http://localhost:5555/api/userdata/${userId}/expenses/${expenseId}`,
+        { headers: getAuthHeader() }
+      );
       setExpense((prev) => prev.filter((exp) => exp._id !== expenseId));
       alert("Expense deleted successfully!");
     } catch (error) {
@@ -61,10 +69,12 @@ const ExpenseHistory = ({ userId }) => {
     if (newDescription === null) return;
 
     try {
-      // API here
-      // Example:
-      // const response = await axios.put(`/your-edit-expense-api/${exp._id}`, { ...exp, description: newDescription });
-      // After successful edit, update the state:
+      // Send PUT request with JWT header
+      await axios.put(
+        `http://localhost:5555/api/userdata/${userId}/expenses/${exp._id}`,
+        { ...exp, description: newDescription },
+        { headers: getAuthHeader() }
+      );
       setExpense((prev) =>
         prev.map((e) =>
           e._id === exp._id ? { ...e, description: newDescription } : e

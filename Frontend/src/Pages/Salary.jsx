@@ -10,7 +10,7 @@ const Salary = () => {
   const { user } = useContext(UserContext);
   const [loading, setLoading] = useState(true);
   const [userData, setUserData] = useState(null);
-  
+
   // Form state for salary updates
   const [salaryData, setSalaryData] = useState({
     salary: "",
@@ -25,25 +25,35 @@ const Salary = () => {
     date: new Date(),
   });
 
+  // Helper for JWT header
+  const getAuthHeader = () => {
+    const token = localStorage.getItem('token');
+    return token ? { Authorization: `Bearer ${token}` } : {};
+  };
+
   // Fetch existing user data on component mount
   useEffect(() => {
-    if (user && user._id) {
+    if (user && user.id) {
       fetchUserData();
     }
+
   }, [user]);
 
   const fetchUserData = async () => {
     try {
       setLoading(true);
-      const response = await axios.get(`http://localhost:5555/api/userdata/${user._id}`);
+      const response = await axios.get(
+        `http://localhost:5555/api/userdata/${user.id}`,
+        { headers: getAuthHeader() }
+      );
       setUserData(response.data);
-      
+
       // Set form data from existing values
       setSalaryData({
         salary: response.data.salary || "",
         recurringSalary: response.data.recurringSalary || ""
       });
-      
+
       setLoading(false);
     } catch (error) {
       console.error("Error fetching user data:", error);
@@ -70,23 +80,24 @@ const Salary = () => {
   // Submit handler for salary update
   const handleSalarySubmit = async (e) => {
     e.preventDefault();
-    
-    if (!user || !user._id) {
+
+    if (!user || !user.id) {
       alert("You must be logged in to update salary information");
       return;
     }
-    
+
     try {
       const response = await axios.post(
         `http://localhost:5555/api/userdata`,
         {
-          userId: user._id,
+          userId: user.id,
           username: user.username || userData?.username,
           salary: parseFloat(salaryData.salary),
           recurringSalary: parseFloat(salaryData.recurringSalary)
-        }
+        },
+        { headers: getAuthHeader() }
       );
-      
+
       alert("Salary information updated successfully!");
       setUserData(response.data);
     } catch (error) {
@@ -98,26 +109,27 @@ const Salary = () => {
   // Submit handler for one-time income
   const handleIncomeSubmit = async (e) => {
     e.preventDefault();
-    
-    if (!user || !user._id) {
+
+    if (!user || !user.id) {
       alert("You must be logged in to add income");
       return;
     }
-    
+
     try {
       const response = await axios.post(
-        `http://localhost:5555/api/userdata/${user._id}/income`,
+        `http://localhost:5555/api/userdata/${user.id}/income`,
         {
           description: incomeData.description,
           amount: parseFloat(incomeData.amount),
           category: incomeData.category,
           date: incomeData.date
-        }
+        },
+        { headers: getAuthHeader() }
       );
-      
+
       alert("Income added successfully!");
       setUserData(response.data);
-      
+
       // Reset form after successful submission
       setIncomeData({
         description: "",
@@ -147,11 +159,11 @@ const Salary = () => {
       <Navbar />
       <div className="max-w-4xl mx-auto mt-10 p-6 bg-white shadow-md rounded-lg">
         <h2 className="text-2xl font-semibold text-gray-700 mb-6">Manage Salary & Income</h2>
-        
+
         {/* Tabs for different sections */}
         <div className="mb-8">
           <h3 className="text-xl font-medium text-gray-700 mb-4">Regular Salary Information</h3>
-          
+
           <form onSubmit={handleSalarySubmit} className="space-y-6">
             <div className="grid grid-cols-4 gap-4 items-center">
               <label htmlFor="salary" className="text-gray-600 font-medium">
@@ -169,7 +181,7 @@ const Salary = () => {
                 placeholder="Enter your monthly salary"
               />
             </div>
-            
+
             <div className="grid grid-cols-4 gap-4 items-center">
               <label htmlFor="recurringSalary" className="text-gray-600 font-medium">
                 Day of Month (₹):
@@ -187,7 +199,7 @@ const Salary = () => {
                 placeholder="Enter day of month when salary is credited (1-31)"
               />
             </div>
-            
+
             <button
               type="submit"
               className="w-full bg-blue-500 text-white py-2 px-4 rounded-md hover:bg-blue-600 transition"
@@ -195,7 +207,7 @@ const Salary = () => {
               Update Salary Information
             </button>
           </form>
-          
+
           {userData && (
             <div className="mt-4 p-4 bg-gray-50 rounded-md">
               <p className="text-gray-700">
@@ -207,10 +219,10 @@ const Salary = () => {
             </div>
           )}
         </div>
-        
+
         <div className="border-t pt-8">
           <h3 className="text-xl font-medium text-gray-700 mb-4">Add One-time Income</h3>
-          
+
           <form onSubmit={handleIncomeSubmit} className="space-y-6">
             <div className="grid grid-cols-4 gap-4 items-center">
               <label htmlFor="description" className="text-gray-600 font-medium">
@@ -227,7 +239,7 @@ const Salary = () => {
                 placeholder="Bonus, Freelance work, etc."
               />
             </div>
-            
+
             <div className="grid grid-cols-4 gap-4 items-center">
               <label htmlFor="amount" className="text-gray-600 font-medium">
                 Amount (₹):
@@ -244,7 +256,7 @@ const Salary = () => {
                 placeholder="Enter amount"
               />
             </div>
-            
+
             <div className="grid grid-cols-4 gap-4 items-center">
               <label htmlFor="date" className="text-gray-600 font-medium">
                 Date:
@@ -258,7 +270,7 @@ const Salary = () => {
                 required
               />
             </div>
-            
+
             <div className="grid grid-cols-4 gap-4 items-center">
               <label htmlFor="category" className="text-gray-600 font-medium">
                 Category:
@@ -278,7 +290,7 @@ const Salary = () => {
                 <option value="Other">Other</option>
               </select>
             </div>
-            
+
             <button
               type="submit"
               className="w-full bg-green-500 text-white py-2 px-4 rounded-md hover:bg-green-600 transition"
@@ -286,10 +298,10 @@ const Salary = () => {
               Add One-time Income
             </button>
           </form>
-        </div> 
+        </div>
       </div>
       <div>
-            {user && user._id && <IncomeHistory userId={user._id} />}
+        {user && user.id && <IncomeHistory userId={user.id} />}
       </div>
     </div>
   );
@@ -298,7 +310,6 @@ const Salary = () => {
 // Helper function to get the correct suffix for the day
 const getDaySuffix = (day) => {
   if (day >= 11 && day <= 13) return "th";
-  
   switch (day % 10) {
     case 1: return "st";
     case 2: return "nd";

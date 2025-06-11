@@ -8,11 +8,12 @@ const Login = () => {
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
   const { setUser } = useContext(UserContext);
-  const navigate=useNavigate();
+  const navigate = useNavigate();
+
   const handleLogin = async () => {
     setError('');
     setSuccess('');
-    
+
     try {
       const response = await fetch('http://localhost:5555/api/auth/login', {
         method: 'POST',
@@ -26,12 +27,14 @@ const Login = () => {
 
       if (response.status === 200) {
         setSuccess('Login successful!');
-        setUser(data.user)
+        setUser(data.user);
+
+        // Store JWT token and user in localStorage for persistence
+        localStorage.setItem('token', data.token);
+        localStorage.setItem('user', JSON.stringify(data.user));
+
         navigate('/Dashboard');
-        setError(data.message); 
-      }
-      else 
-      {
+      } else {
         setError(data.message);
       }
     } catch (error) {

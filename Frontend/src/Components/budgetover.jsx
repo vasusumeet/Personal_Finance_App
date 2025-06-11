@@ -16,11 +16,21 @@ const BudgetOverview = () => {
 
   useEffect(() => {
     const fetchData = async () => {
-      if (!user || !user._id) return;
+      if (!user || !user.id) return;
       
       try {
         setLoading(true);
-        const response = await axios.get(`http://localhost:5555/api/userdata/${user._id}`);
+        const token = localStorage.getItem('token');
+        if (!token) {
+          console.error('No auth token found. Please login again.');
+          setLoading(false);
+          return;
+        }
+        const response = await axios.get(`http://localhost:5555/api/userdata/${user.id}`, {
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
+        });
         const userData = response.data;
         
         // Calculate total expenses for current month
@@ -28,7 +38,7 @@ const BudgetOverview = () => {
         const currentMonth = currentDate.getMonth();
         const currentYear = currentDate.getFullYear();
         
-        const monthlyExpenses = userData.expenses
+        const monthlyExpenses = (userData.expenses || [])
           .filter(expense => {
             const expenseDate = new Date(expense.date);
             return expenseDate.getMonth() === currentMonth && 
@@ -36,7 +46,7 @@ const BudgetOverview = () => {
           })
           .reduce((total, expense) => total + expense.amount, 0);
         
-        const monthlyIncome = userData.income
+        const monthlyIncome = (userData.income || [])
           .filter(income => {
             const incomeDate = new Date(income.date);
             return incomeDate.getMonth() === currentMonth && 
@@ -87,7 +97,6 @@ const BudgetOverview = () => {
     ],
   };
 
-  
   const remainingBudget = budgetData.salary - budgetData.totalExpenses;
   const percentUsed = budgetData.salary > 0 ? 
     Math.round((budgetData.totalExpenses / budgetData.salary) * 100) : 0;

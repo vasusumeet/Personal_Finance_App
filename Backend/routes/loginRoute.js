@@ -2,6 +2,8 @@ import express from 'express';
 import { LoginData } from '../models/userLogin.js'; 
 import { UserData } from '../models/UserData.js';
 import bcrypt from 'bcrypt'; 
+import jwt from 'jsonwebtoken';
+import { jwtSecret } from '../config.js'; // Assuming you export jwtSecret from config.js
 
 const loginRoute = express.Router();
 
@@ -21,7 +23,7 @@ loginRoute.post('/signup', async (request, response) => {
     const newUserData = new UserData({ userId: newUser._id, username: newUser.username, salary: 0, recurringSalary: 0, expenses: [], savingsGoals: [] });
     await newUserData.save();
 
-    // Do not send password in response
+    // Prepare user data to send in response (exclude password)
     const userResponse = {
       id: newUser._id,
       username: newUser.username,
@@ -34,7 +36,14 @@ loginRoute.post('/signup', async (request, response) => {
       }
     };
 
-    return response.status(201).send({ message: 'User created successfully', user: userResponse });
+    // Generate JWT token
+    const token = jwt.sign(
+      { id: newUser._id, username: newUser.username, email: newUser.email },
+      jwtSecret,
+      { expiresIn: '7d' }
+    );
+
+    return response.status(201).send({ message: 'User created successfully', user: userResponse, token });
   } catch (error) {
     console.log(error);
     return response.status(500).send({ message: error.message });
@@ -66,11 +75,36 @@ loginRoute.post('/login', async (request, response) => {
       return response.status(401).send({ message: 'Invalid credentials' });
     }
 
-    return response.status(200).send({ message: 'User authenticated successfully', user });
+    // Fetch associated user data
+    const userData = await UserData.findOne({ userId: user._id });
+
+    // Prepare user data to send in response (exclude password)
+    const userResponse = {
+      id: user._id,
+      username: user.username,
+      email: user.email,
+      userData: userData
+        ? {
+            salary: userData.salary,
+            recurringSalary: userData.recurringSalary,
+            expenses: userData.expenses,
+            savingsGoals: userData.savingsGoals
+          }
+        : null
+    };
+
+    // Generate JWT token
+    const token = jwt.sign(
+      { id: user._id, username: user.username, email: user.email },
+      jwtSecret,
+      { expiresIn: '7d' }
+    );
+
+    return response.status(200).send({ message: 'User authenticated successfully', user: userResponse, token });
   } catch (error) {
     console.log(error);
     return response.status(500).send({ message: error.message });
   }
-}); 
+});
 
 export default loginRoute;

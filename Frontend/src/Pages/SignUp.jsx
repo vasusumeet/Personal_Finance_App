@@ -29,6 +29,10 @@ const SignUp = () => {
       .then((response) => {
         setLoading(false);
         if (response.status === 201) {
+          // Store user and token in localStorage for persistence
+          localStorage.setItem('user', JSON.stringify(response.data.user));
+          localStorage.setItem('token', response.data.token);
+
           setUser(response.data.user); // Set user context
           navigate('/Dashboard');      // Redirect to dashboard
         } else {

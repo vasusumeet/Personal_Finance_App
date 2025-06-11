@@ -18,14 +18,23 @@ const Savings = () => {
   const [savingsGoals, setSavingsGoals] = useState([]);
   const [loading, setLoading] = useState(true);
 
+  // Helper for JWT header
+  const getAuthHeader = () => {
+    const token = localStorage.getItem('token');
+    return token ? { Authorization: `Bearer ${token}` } : {};
+  };
+
   // Fetch existing savings goals
   useEffect(() => {
     const fetchSavingsGoals = async () => {
-      if (!user || !user._id) return;
+      if (!user || !user.id) return;
       
       try {
         setLoading(true);
-        const response = await axios.get(`http://localhost:5555/api/userdata/${user._id}`);
+        const response = await axios.get(
+          `http://localhost:5555/api/userdata/${user.id}`,
+          { headers: getAuthHeader() }
+        );
         const userData = response.data;
         setSavingsGoals(userData.savingsGoals || []);
       } catch (error) {
@@ -50,28 +59,25 @@ const Savings = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     
-    if (!user || !user._id) {
+    if (!user || !user.id) {
       alert("You must be logged in to add savings goals");
       return;
     }
     
     try {
       const response = await axios.post(
-        `http://localhost:5555/api/userdata/${user._id}/savings-goals`, 
+        `http://localhost:5555/api/userdata/${user.id}/savings-goals`, 
         {
           goalName: formData.goalName,
           targetAmount: parseFloat(formData.targetAmount),
           currentAmount: parseFloat(formData.currentAmount),
           deadline: formData.deadline.toISOString().split("T")[0], 
-        }
+        },
+        { headers: getAuthHeader() }
       );
       
       alert("Savings goal added successfully!");
-      
-      // Update the savings goals list with the new data
       setSavingsGoals(response.data.savingsGoals);
-      
-      // Reset form
       setFormData({
         goalName: "",
         targetAmount: "",
@@ -85,16 +91,15 @@ const Savings = () => {
   };
 
   const handleDelete = async (goalId) => {
-    if (!confirm("Are you sure you want to delete this savings goal?")) {
+    if (!window.confirm("Are you sure you want to delete this savings goal?")) {
       return;
     }
     
     try {
       const response = await axios.delete(
-        `http://localhost:5555/api/userdata/${user._id}/savings-goals/${goalId}`
+        `http://localhost:5555/api/userdata/${user.id}/savings-goals/${goalId}`,
+        { headers: getAuthHeader() }
       );
-      
-      // Update the savings goals list after deletion
       setSavingsGoals(response.data.savingsGoals);
       alert("Savings goal deleted successfully!");
     } catch (error) {

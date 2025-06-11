@@ -8,15 +8,29 @@ const SalaryInfo = () => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (user && user._id) {
+    if (user && user.id) {
       fetchSalaryData();
     }
+    // eslint-disable-next-line
   }, [user]);
 
   const fetchSalaryData = async () => {
     try {
       setLoading(true);
-      const response = await axios.get(`http://localhost:5555/api/userdata/${user._id}`);
+      const token = localStorage.getItem('token');
+      if (!token) {
+        console.error('No auth token found. Please login again.');
+        setLoading(false);
+        return;
+      }
+      const response = await axios.get(
+        `http://localhost:5555/api/userdata/${user.id}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
+        }
+      );
       setSalaryData({
         salary: response.data.salary,
         recurringSalary: response.data.recurringSalary
@@ -34,16 +48,13 @@ const SalaryInfo = () => {
     const now = new Date();
     const currentMonth = now.getMonth();
     const currentYear = now.getFullYear();
-    
 
     let nextSalaryDate = new Date(currentYear, currentMonth, salaryData.recurringSalary);
 
     if (now > nextSalaryDate) {
       if (currentMonth === 11) {
-
         nextSalaryDate = new Date(currentYear + 1, 0, salaryData.recurringSalary);
       } else {
-
         nextSalaryDate = new Date(currentYear, currentMonth + 1, salaryData.recurringSalary);
       }
     }
@@ -94,7 +105,6 @@ const SalaryInfo = () => {
 // Helper function to get the correct suffix for the day
 const getDaySuffix = (day) => {
   if (day >= 11 && day <= 13) return "th";
-  
   switch (day % 10) {
     case 1: return "st";
     case 2: return "nd";

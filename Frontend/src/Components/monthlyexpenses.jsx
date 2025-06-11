@@ -33,17 +33,27 @@ const MonthlyExpensesTrend = () => {
 
   useEffect(() => {
     const fetchData = async () => {
-      if (!user || !user._id) return;
+      if (!user || !user.id) return;
       
       try {
         setLoading(true);
-        const response = await axios.get(`http://localhost:5555/api/userdata/${user._id}`);
+        const token = localStorage.getItem('token');
+        if (!token) {
+          console.error('No auth token found. Please login again.');
+          setLoading(false);
+          return;
+        }
+        const response = await axios.get(`http://localhost:5555/api/userdata/${user.id}`, {
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
+        });
         const userData = response.data;
         
         // Group expenses by month
         const monthlyData = {};
         
-        userData.expenses.forEach(expense => {
+        (userData.expenses || []).forEach(expense => {
           const date = new Date(expense.date);
           const monthYear = `${date.getMonth() + 1}/${date.getFullYear()}`;
           

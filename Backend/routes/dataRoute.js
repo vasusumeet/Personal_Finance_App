@@ -1,12 +1,29 @@
 import express from 'express';
 import mongoose from 'mongoose';
 import { UserData } from '../models/UserData.js';
+import authenticate from '../middleware/authMiddleware.js';
+
+
+
 
 const dataRoute = express.Router();
 
-//Fetch User Data
+// Apply the JWT middleware to all routes in this router
+dataRoute.use(authenticate);
+
+// Helper to check user ownership
+function checkOwnership(req, res, userId) {
+    if (req.user.id !== userId) {
+        return res.status(403).json({ message: 'Forbidden: You do not own this data.' });
+    }
+    return null;
+}
+
+// Fetch or update User Data
 dataRoute.post('/userdata', async (req, res) => {
     const { userId, salary, recurringSalary } = req.body;
+    const forbidden = checkOwnership(req, res, userId);
+    if (forbidden) return;
 
     try {
         let userData = await UserData.findOne({ userId });
@@ -26,10 +43,12 @@ dataRoute.post('/userdata', async (req, res) => {
     }
 });
 
-//Post Income
+// Post Income
 dataRoute.post('/userdata/:userId/income', async (req, res) => {
     const { userId } = req.params;
     const { description, amount, date, category } = req.body;
+    const forbidden = checkOwnership(req, res, userId);
+    if (forbidden) return;
 
     try {
         const userData = await UserData.findOne({ userId });
@@ -38,9 +57,7 @@ dataRoute.post('/userdata/:userId/income', async (req, res) => {
             return res.status(404).json({ message: 'User data not found' });
         }
 
-    
         if (!userData.income) userData.income = [];
-     
         userData.income.push({ description, amount, date, category });
 
         await userData.save();
@@ -51,9 +68,11 @@ dataRoute.post('/userdata/:userId/income', async (req, res) => {
     }
 });
 
-//Get Income Data
+// Get Income Data
 dataRoute.get('/userdata/:userId/income', async (req, res) => {
     const { userId } = req.params;
+    const forbidden = checkOwnership(req, res, userId);
+    if (forbidden) return;
 
     try {
         const userData = await UserData.findOne({ userId });
@@ -69,10 +88,11 @@ dataRoute.get('/userdata/:userId/income', async (req, res) => {
     }
 });
 
-
-//Delete Income 
+// Delete Income
 dataRoute.delete('/userdata/:userId/income/:incomeId', async (req, res) => {
     const { userId, incomeId } = req.params;
+    const forbidden = checkOwnership(req, res, userId);
+    if (forbidden) return;
 
     try {
         const userData = await UserData.findOne({ userId });
@@ -95,9 +115,12 @@ dataRoute.delete('/userdata/:userId/income/:incomeId', async (req, res) => {
     }
 });
 
+// Post Expense
 dataRoute.post('/userdata/:userId/expenses', async (req, res) => {
     const { userId } = req.params;
     const { description, amount, date, category } = req.body;
+    const forbidden = checkOwnership(req, res, userId);
+    if (forbidden) return;
 
     try {
         const userData = await UserData.findOne({ userId });
@@ -106,8 +129,8 @@ dataRoute.post('/userdata/:userId/expenses', async (req, res) => {
             return res.status(404).json({ message: 'User data not found' });
         }
 
-        if (!userData.expenses) userData.expenses = []; 
-                userData.expenses.push({ description, amount, date, category });
+        if (!userData.expenses) userData.expenses = [];
+        userData.expenses.push({ description, amount, date, category });
 
         await userData.save();
         res.status(200).json(userData);
@@ -116,10 +139,13 @@ dataRoute.post('/userdata/:userId/expenses', async (req, res) => {
         res.status(500).json({ message: 'Error adding expense', error });
     }
 });
-// Add Savings Goal - Creates a new savings target
+
+// Add Savings Goal
 dataRoute.post('/userdata/:userId/savings-goals', async (req, res) => {
     const { userId } = req.params;
     const { goalName, targetAmount, currentAmount, deadline } = req.body;
+    const forbidden = checkOwnership(req, res, userId);
+    if (forbidden) return;
 
     try {
         const userData = await UserData.findOne({ userId });
@@ -128,7 +154,7 @@ dataRoute.post('/userdata/:userId/savings-goals', async (req, res) => {
             return res.status(404).json({ message: 'User data not found' });
         }
 
-        if (!userData.savingsGoals) userData.savingsGoals = []; // Ensure array exists
+        if (!userData.savingsGoals) userData.savingsGoals = [];
         userData.savingsGoals.push({ goalName, targetAmount, currentAmount, deadline });
 
         await userData.save();
@@ -139,9 +165,11 @@ dataRoute.post('/userdata/:userId/savings-goals', async (req, res) => {
     }
 });
 
-// Fetch User Data - Retrieves all user data for a specific user ID
+// Fetch User Data
 dataRoute.get('/userdata/:userId', async (req, res) => {
     const { userId } = req.params;
+    const forbidden = checkOwnership(req, res, userId);
+    if (forbidden) return;
 
     try {
         const userData = await UserData.findOne({ userId });
@@ -157,10 +185,12 @@ dataRoute.get('/userdata/:userId', async (req, res) => {
     }
 });
 
-//Update Expense
+// Update Expense
 dataRoute.put('/userdata/:userId/expenses/:expenseId', async (req, res) => {
     const { userId, expenseId } = req.params;
     const { description, amount, date, category } = req.body;
+    const forbidden = checkOwnership(req, res, userId);
+    if (forbidden) return;
 
     try {
         const userData = await UserData.findOne({ userId });
@@ -187,8 +217,11 @@ dataRoute.put('/userdata/:userId/expenses/:expenseId', async (req, res) => {
     }
 });
 
+// Delete Expense
 dataRoute.delete('/userdata/:userId/expenses/:expenseId', async (req, res) => {
     const { userId, expenseId } = req.params;
+    const forbidden = checkOwnership(req, res, userId);
+    if (forbidden) return;
 
     try {
         const userData = await UserData.findOne({ userId });
@@ -207,52 +240,54 @@ dataRoute.delete('/userdata/:userId/expenses/:expenseId', async (req, res) => {
     }
 });
 
-// Update Savings Goal - Modifies an existing savings goal
+// Update Savings Goal
 dataRoute.put('/userdata/:userId/savings-goals/:goalId', async (req, res) => {
     const { userId, goalId } = req.params;
     const { goalName, targetAmount, currentAmount, deadline, deductFromSalary } = req.body;
-  
-    try {
-      const userData = await UserData.findOne({ userId });
-  
-      if (!userData) {
-        return res.status(404).json({ message: 'User data not found' });
-      }
-  
-      const goal = userData.savingsGoals.id(goalId);
-      if (!goal) {
-        return res.status(404).json({ message: 'Savings goal not found' });
-      }
+    const forbidden = checkOwnership(req, res, userId);
+    if (forbidden) return;
 
-      if (goalName) goal.goalName = goalName;
-      if (targetAmount) goal.targetAmount = targetAmount;
-      if (deadline) goal.deadline = deadline;
-  
- 
-      if (currentAmount) {
-        goal.currentAmount += currentAmount;
-      }
-  
-      if (deductFromSalary) {
-     
-        if (userData.recurringSalary >= currentAmount) {
-          userData.recurringSalary -= currentAmount;
-        } else {
-         
-          userData.salary -= currentAmount;
+    try {
+        const userData = await UserData.findOne({ userId });
+
+        if (!userData) {
+            return res.status(404).json({ message: 'User data not found' });
         }
-      }
-  
-      await userData.save();
-      res.status(200).json(userData);
+
+        const goal = userData.savingsGoals.id(goalId);
+        if (!goal) {
+            return res.status(404).json({ message: 'Savings goal not found' });
+        }
+
+        if (goalName) goal.goalName = goalName;
+        if (targetAmount) goal.targetAmount = targetAmount;
+        if (deadline) goal.deadline = deadline;
+
+        if (currentAmount) {
+            goal.currentAmount += currentAmount;
+        }
+
+        if (deductFromSalary) {
+            if (userData.recurringSalary >= currentAmount) {
+                userData.recurringSalary -= currentAmount;
+            } else {
+                userData.salary -= currentAmount;
+            }
+        }
+
+        await userData.save();
+        res.status(200).json(userData);
     } catch (error) {
-      console.error('Error updating savings goal:', error);
-      res.status(500).json({ message: 'Error updating savings goal', error });
+        console.error('Error updating savings goal:', error);
+        res.status(500).json({ message: 'Error updating savings goal', error });
     }
-  });
-// Delete Savings Goal - Removes a savings goal
+});
+
+// Delete Savings Goal
 dataRoute.delete('/userdata/:userId/savings-goals/:goalId', async (req, res) => {
     const { userId, goalId } = req.params;
+    const forbidden = checkOwnership(req, res, userId);
+    if (forbidden) return;
 
     try {
         const userData = await UserData.findOne({ userId });
@@ -270,10 +305,13 @@ dataRoute.delete('/userdata/:userId/savings-goals/:goalId', async (req, res) => 
         res.status(500).json({ message: 'Error deleting savings goal', error });
     }
 });
-// Contribute to Savings Goal - Adds money to a specific savings goal
+
+// Contribute to Savings Goal
 dataRoute.post('/userdata/:userId/savings-goals/:goalId/contribute', async (req, res) => {
     const { userId, goalId } = req.params;
     const { amount } = req.body;
+    const forbidden = checkOwnership(req, res, userId);
+    if (forbidden) return;
 
     try {
         const userData = await UserData.findOne({ userId });
@@ -306,10 +344,11 @@ dataRoute.post('/userdata/:userId/savings-goals/:goalId/contribute', async (req,
     }
 });
 
-
-// End-of-Month Savings - Processes remaining salary into savings at month end
+// End-of-Month Savings
 dataRoute.post('/userdata/:userId/end-of-month-savings', async (req, res) => {
     const { userId } = req.params;
+    const forbidden = checkOwnership(req, res, userId);
+    if (forbidden) return;
 
     try {
         const userData = await UserData.findOne({ userId });
@@ -319,7 +358,7 @@ dataRoute.post('/userdata/:userId/end-of-month-savings', async (req, res) => {
         }
 
         // Calculate total expenses for the month
-        const totalExpenses = userData.expenses ? 
+        const totalExpenses = userData.expenses ?
             userData.expenses.reduce((sum, expense) => sum + expense.amount, 0) : 0;
 
         // Calculate remaining salary after expenses
@@ -355,76 +394,77 @@ dataRoute.post('/userdata/:userId/end-of-month-savings', async (req, res) => {
         res.status(500).json({ message: 'Error processing end-of-month savings', error });
     }
 });
-// Fetch Expenses - Gets paginated list of user expenses
+
+// Fetch Expenses (paginated)
 dataRoute.get('/userdata/:userId/expensehis', async (req, res) => {
     const userId = req.params.userId;
+    const forbidden = checkOwnership(req, res, userId);
+    if (forbidden) return;
+
     const page = parseInt(req.query.page) || 1;
     const limit = parseInt(req.query.limit) || 5;
     const skip = (page - 1) * limit;
-  
+
     try {
-      // Find the user data first
-      const userData = await UserData.findOne({ userId });
-      
-      if (!userData) {
-        return res.status(404).json({ message: 'User data not found' });
-      }
-      
-      // Get expenses from the userData object
-      const expenses = userData.expenses || [];
-      const total = expenses.length;
-      
-      // Manual pagination since we're working with an array
-      const paginatedExpenses = expenses
-        .sort((a, b) => new Date(b.date) - new Date(a.date))
-        .slice(skip, skip + limit);
-  
-      res.json({
-        expenses: paginatedExpenses,
-        total,
-        page,
-        totalPages: Math.ceil(total / limit)
-      });
+        const userData = await UserData.findOne({ userId });
+
+        if (!userData) {
+            return res.status(404).json({ message: 'User data not found' });
+        }
+
+        const expenses = userData.expenses || [];
+        const total = expenses.length;
+
+        const paginatedExpenses = expenses
+            .sort((a, b) => new Date(b.date) - new Date(a.date))
+            .slice(skip, skip + limit);
+
+        res.json({
+            expenses: paginatedExpenses,
+            total,
+            page,
+            totalPages: Math.ceil(total / limit)
+        });
     } catch (error) {
-      console.error('Error fetching expenses:', error);
-      res.status(500).json({ message: 'Error fetching expenses' });
-    }
-});
-// Fetch Income - Gets paginated list of users Income history
-dataRoute.get('/userdata/:userId/incomehis', async (req, res) => {
-    const userId = req.params.userId;
-    const page = parseInt(req.query.page) || 1;
-    const limit = parseInt(req.query.limit) || 5;
-    const skip = (page - 1) * limit;
-  
-    try {
-     
-      const userData = await UserData.findOne({ userId });
-      
-      if (!userData) {
-        return res.status(404).json({ message: 'User data not found' });
-      }
-      
-      // Get expenses from the userData object
-      const income = userData.income || [];
-      const total = income.length;
-      
-      // Manual pagination since we're working with an array
-      const paginatedIncome = income
-        .sort((a, b) => new Date(b.date) - new Date(a.date))
-        .slice(skip, skip + limit);
-  
-      res.json({
-        income: paginatedIncome,
-        total,
-        page,
-        totalPages: Math.ceil(total / limit)
-      });
-    } catch (error) {
-      console.error('Error fetching Income:', error);
-      res.status(500).json({ message: 'Error fetching Income' });
+        console.error('Error fetching expenses:', error);
+        res.status(500).json({ message: 'Error fetching expenses' });
     }
 });
 
+// Fetch Income (paginated)
+dataRoute.get('/userdata/:userId/incomehis', async (req, res) => {
+    const userId = req.params.userId;
+    const forbidden = checkOwnership(req, res, userId);
+    if (forbidden) return;
+
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 5;
+    const skip = (page - 1) * limit;
+
+    try {
+        const userData = await UserData.findOne({ userId });
+
+        if (!userData) {
+            return res.status(404).json({ message: 'User data not found' });
+        }
+
+        const income = userData.income || [];
+        const total = income.length;
+
+        const paginatedIncome = income
+            .sort((a, b) => new Date(b.date) - new Date(a.date))
+            .slice(skip, skip + limit);
+
+        res.json({
+            income: paginatedIncome,
+            total,
+            page,
+            totalPages: Math.ceil(total / limit)
+        });
+    } catch (error) {
+        console.error('Error fetching Income:', error);
+        res.status(500).json({ message: 'Error fetching Income' });
+    }
+});
 
 export default dataRoute;

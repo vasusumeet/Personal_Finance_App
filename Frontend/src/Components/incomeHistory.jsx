@@ -10,12 +10,20 @@ const IncomeHistory = ({ userId }) => {
   useEffect(() => {
     const fetchIncome = async () => {
       try {
+        const token = localStorage.getItem('token');
+        if (!token) {
+          alert("Authentication token missing. Please log in again.");
+          return;
+        }
         const response = await axios.get(
           `http://localhost:5555/api/userdata/${userId}/incomehis`,
           {
             params: {
               page: currentPage,
               limit: itemsPerPage
+            },
+            headers: {
+              Authorization: `Bearer ${token}`
             }
           }
         );

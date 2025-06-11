@@ -1,4 +1,4 @@
-import React, { useState, useContext, useEffect } from "react";
+import React, { useState, useContext } from "react";
 import axios from "axios";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
@@ -28,19 +28,31 @@ const Expenses = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    if (!user || !user._id) {
+    if (!user || !user.id) {
       alert("You must be logged in to add expenses");
       return;
     }
-    
+
+    // Get JWT token from localStorage
+    const token = localStorage.getItem('token');
+    if (!token) {
+      alert("Authentication token missing. Please log in again.");
+      return;
+    }
+
     try {
       const response = await axios.post(
-        `http://localhost:5555/api/userdata/${user._id}/expenses`, 
+        `http://localhost:5555/api/userdata/${user.id}/expenses`, 
         {
           description: formData.description, 
           amount: parseFloat(formData.amount),
           category: formData.category,
           date: formData.date.toISOString().split("T")[0],
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          }
         }
       );
       
@@ -142,7 +154,7 @@ const Expenses = () => {
             <ExpensesByCategory/>
           </div>
           <div className="">
-            {user && user._id && <ExpenseHistory userId={user._id} />}
+            {user && user.id && <ExpenseHistory userId={user.id} />}
           </div>
         </div>
       </div>
