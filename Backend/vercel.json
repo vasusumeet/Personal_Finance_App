@@ -2,14 +2,14 @@
   "version": 2,
   "builds": [
     {
-      "src": "index.js",        // Or your entry file (e.g., app.js, dist/index.js)
+      "src": "index.js",        
       "use": "@vercel/node"
     }
   ],
   "routes": [
     {
       "src": "/(.*)",
-      "dest": "/index.js",      // Or your entry file
+      "dest": "/index.js",     
       "methods": ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
       "headers": {
         "Access-Control-Allow-Origin": "https://personal-finance-app-front.vercel.app",
