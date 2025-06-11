@@ -1,13 +1,19 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
-
+import ConfirmDialog from "./confirmdialog";
+import EditDialog from "./editdialog";
 const ExpenseHistory = ({ userId }) => {
   const [expense, setExpense] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const itemsPerPage = 5;
 
-  // Helper to get JWT token
+  // Modal state
+  const [confirmOpen, setConfirmOpen] = useState(false);
+  const [editOpen, setEditOpen] = useState(false);
+  const [pendingDeleteId, setPendingDeleteId] = useState(null);
+  const [pendingEditExp, setPendingEditExp] = useState(null);
+
   const getAuthHeader = () => {
     const token = localStorage.getItem('token');
     return token ? { Authorization: `Bearer ${token}` } : {};
@@ -26,7 +32,6 @@ const ExpenseHistory = ({ userId }) => {
             headers: getAuthHeader()
           }
         );
-
         setExpense(response.data.expenses);
         setTotalPages(response.data.totalPages || 1);
       } catch (error) {
@@ -34,56 +39,69 @@ const ExpenseHistory = ({ userId }) => {
         alert("Failed to load expense history");
       }
     };
-
-    if (userId) {
-      fetchExpenses();
-    }
+    if (userId) fetchExpenses();
   }, [userId, currentPage]);
 
-  const handlePageChange = (newPage) => {
-    setCurrentPage(newPage);
+  const handlePageChange = (newPage) => setCurrentPage(newPage);
+
+  // Show confirm dialog
+  const onDeleteClick = (expenseId) => {
+    setPendingDeleteId(expenseId);
+    setConfirmOpen(true);
   };
 
-  // Delete Expense Handler
-  const handleDeleteExp = async (expenseId) => {
-    if (!window.confirm("Are you sure you want to delete this expense?")) return;
-
+  const handleDeleteExp = async () => {
     try {
-      // Send DELETE request with JWT header
       await axios.delete(
-        `http://localhost:5555/api/userdata/${userId}/expenses/${expenseId}`,
+        `http://localhost:5555/api/userdata/${userId}/expenses/${pendingDeleteId}/deleteexp`,
         { headers: getAuthHeader() }
       );
-      setExpense((prev) => prev.filter((exp) => exp._id !== expenseId));
+      setExpense((prev) => prev.filter((exp) => exp._id !== pendingDeleteId));
+      setConfirmOpen(false);
+      setPendingDeleteId(null);
       alert("Expense deleted successfully!");
     } catch (error) {
       console.error("Error deleting expense:", error);
       alert("Failed to delete expense.");
+      setConfirmOpen(false);
+      setPendingDeleteId(null);
     }
   };
 
-  // Edit Expense Handler
-  const handleEditExp = async (exp) => {
-    // For demonstration, prompt for a new description
-    const newDescription = window.prompt("Edit description:", exp.description);
-    if (newDescription === null) return;
+  // Show edit dialog
+  const onEditClick = (exp) => {
+    setPendingEditExp(exp);
+    setEditOpen(true);
+  };
 
+  // Save edited expense
+  const handleEditExp = async (form) => {
     try {
-      // Send PUT request with JWT header
       await axios.put(
-        `http://localhost:5555/api/userdata/${userId}/expenses/${exp._id}`,
-        { ...exp, description: newDescription },
+        `http://localhost:5555/api/userdata/${userId}/expenses/${pendingEditExp._id}/editexp`,
+        {
+          ...pendingEditExp,
+          ...form,
+          amount: parseFloat(form.amount),
+          date: form.date.toISOString().split("T")[0],
+        },
         { headers: getAuthHeader() }
       );
       setExpense((prev) =>
         prev.map((e) =>
-          e._id === exp._id ? { ...e, description: newDescription } : e
+          e._id === pendingEditExp._id
+            ? { ...e, ...form, amount: parseFloat(form.amount), date: form.date }
+            : e
         )
       );
+      setEditOpen(false);
+      setPendingEditExp(null);
       alert("Expense updated successfully!");
     } catch (error) {
       console.error("Error editing expense:", error);
       alert("Failed to edit expense.");
+      setEditOpen(false);
+      setPendingEditExp(null);
     }
   };
 
@@ -115,13 +133,13 @@ const ExpenseHistory = ({ userId }) => {
                   </td>
                   <td className="p-2 border">
                     <button
-                      onClick={() => handleDeleteExp(exp._id)}
+                      onClick={() => onDeleteClick(exp._id)}
                       className="px-2 py-1.5 bg-red-700 text-white rounded hover:opacity-50"
                     >
                       Delete
                     </button>
                     <button
-                      onClick={() => handleEditExp(exp)}
+                      onClick={() => onEditClick(exp)}
                       className="px-4 py-1.5 bg-blue-500 text-white rounded hover:opacity-50 ml-2"
                     >
                       Edit
@@ -160,6 +178,21 @@ const ExpenseHistory = ({ userId }) => {
           Next
         </button>
       </div>
+
+      {/* Custom dialogs */}
+      <ConfirmDialog
+        open={confirmOpen}
+        title="Delete Expense"
+        message="Are you sure you want to delete this expense?"
+        onConfirm={handleDeleteExp}
+        onCancel={() => setConfirmOpen(false)}
+      />
+      <EditDialog
+        open={editOpen}
+        expense={pendingEditExp}
+        onSave={handleEditExp}
+        onCancel={() => setEditOpen(false)}
+      />
     </div>
   );
 };

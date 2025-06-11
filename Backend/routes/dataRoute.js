@@ -139,6 +139,64 @@ dataRoute.post('/userdata/:userId/expenses', async (req, res) => {
         res.status(500).json({ message: 'Error adding expense', error });
     }
 });
+// Edit an expense
+dataRoute.put('/userdata/:userId/expenses/:expenseId/editexp', async (req, res) => {
+    const { userId, expenseId } = req.params;
+    const { description, amount, date, category } = req.body;
+    const forbidden = checkOwnership(req, res, userId);
+    if (forbidden) return;
+
+    try {
+        const userData = await UserData.findOne({ userId });
+        if (!userData) {
+            return res.status(404).json({ message: 'User data not found' });
+        }
+
+        const expense = userData.expenses.id(expenseId);
+        if (!expense) {
+            return res.status(404).json({ message: 'Expense not found' });
+        }
+
+        // Update the fields
+        if (description !== undefined) expense.description = description;
+        if (amount !== undefined) expense.amount = amount;
+        if (date !== undefined) expense.date = date;
+        if (category !== undefined) expense.category = category;
+
+        await userData.save();
+        res.status(200).json({ message: 'Expense updated successfully', expense });
+    } catch (error) {
+        console.error('Error editing expense:', error);
+        res.status(500).json({ message: 'Error editing expense', error });
+    }
+});
+
+// Delete an expense
+dataRoute.delete('/userdata/:userId/expenses/:expenseId/deleteexp', async (req, res) => {
+    const { userId, expenseId } = req.params;
+    const forbidden = checkOwnership(req, res, userId);
+    if (forbidden) return;
+
+    try {
+        const userData = await UserData.findOne({ userId });
+        if (!userData) {
+            return res.status(404).json({ message: 'User data not found' });
+        }
+
+        const originalLength = userData.expenses.length;
+        userData.expenses = userData.expenses.filter(exp => exp._id.toString() !== expenseId);
+        if (userData.expenses.length === originalLength) {
+            return res.status(404).json({ message: 'Expense not found' });
+        }
+
+        await userData.save();
+        res.status(200).json({ message: 'Expense deleted successfully' });
+    } catch (error) {
+        console.error('Error deleting expense:', error);
+        res.status(500).json({ message: 'Error deleting expense', error });
+    }
+});
+
 
 // Add Savings Goal
 dataRoute.post('/userdata/:userId/savings-goals', async (req, res) => {
