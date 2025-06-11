@@ -6,6 +6,20 @@ import { Bar } from 'react-chartjs-2';
 
 ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend);
 
+const getYears = () => {
+  const currentYear = new Date().getFullYear();
+  const years = [];
+  for (let y = currentYear; y >= currentYear - 10; y--) {
+    years.push(y);
+  }
+  return years;
+};
+
+const months = [
+  'January', 'February', 'March', 'April', 'May', 'June',
+  'July', 'August', 'September', 'October', 'November', 'December'
+];
+
 const BudgetOverview = () => {
   const { user } = useContext(UserContext);
   const [budgetData, setBudgetData] = useState({
@@ -13,6 +27,11 @@ const BudgetOverview = () => {
     totalExpenses: 0
   });
   const [loading, setLoading] = useState(true);
+
+  // Dropdown state
+  const currentDate = new Date();
+  const [selectedMonth, setSelectedMonth] = useState(currentDate.getMonth());
+  const [selectedYear, setSelectedYear] = useState(currentDate.getFullYear());
 
   useEffect(() => {
     const fetchData = async () => {
@@ -33,24 +52,24 @@ const BudgetOverview = () => {
         });
         const userData = response.data;
         
-        // Calculate total expenses for current month
-        const currentDate = new Date();
-        const currentMonth = currentDate.getMonth();
-        const currentYear = currentDate.getFullYear();
-        
+        // Calculate total expenses for selected month and year
         const monthlyExpenses = (userData.expenses || [])
           .filter(expense => {
             const expenseDate = new Date(expense.date);
-            return expenseDate.getMonth() === currentMonth && 
-                   expenseDate.getFullYear() === currentYear;
+            return (
+              expenseDate.getMonth() === selectedMonth &&
+              expenseDate.getFullYear() === selectedYear
+            );
           })
           .reduce((total, expense) => total + expense.amount, 0);
         
         const monthlyIncome = (userData.income || [])
           .filter(income => {
             const incomeDate = new Date(income.date);
-            return incomeDate.getMonth() === currentMonth && 
-                   incomeDate.getFullYear() === currentYear;
+            return (
+              incomeDate.getMonth() === selectedMonth &&
+              incomeDate.getFullYear() === selectedYear
+            );
           })
           .reduce((total, income) => total + income.amount, 0);
         
@@ -66,7 +85,7 @@ const BudgetOverview = () => {
     };
 
     fetchData();
-  }, [user]);
+  }, [user, selectedMonth, selectedYear]);
 
   const options = {
     responsive: true,
@@ -103,7 +122,27 @@ const BudgetOverview = () => {
 
   return (
     <div className="bg-white p-4 rounded-lg shadow-md">
-      <h3 className="text-lg font-semibold mb-4">Monthly Budget Overview</h3>
+      <div className="flex items-center mb-4 gap-4">
+        <h3 className="text-lg font-semibold">Monthly Budget Overview</h3>
+        <select
+          value={selectedMonth}
+          onChange={e => setSelectedMonth(Number(e.target.value))}
+          className="ml-4 p-1 border rounded"
+        >
+          {months.map((month, idx) => (
+            <option value={idx} key={month}>{month}</option>
+          ))}
+        </select>
+        <select
+          value={selectedYear}
+          onChange={e => setSelectedYear(Number(e.target.value))}
+          className="ml-2 p-1 border rounded"
+        >
+          {getYears().map(year => (
+            <option value={year} key={year}>{year}</option>
+          ))}
+        </select>
+      </div>
       {loading ? (
         <div className="flex justify-center items-center h-64">Loading data...</div>
       ) : (
@@ -129,7 +168,7 @@ const BudgetOverview = () => {
             <p className="text-sm text-gray-500 mb-1">Budget Used: {percentUsed}%</p>
             <div className="w-full bg-gray-200 rounded-full h-2.5">
               <div 
-                className={`h-2.5 rounded-full ${percentUsed > 90 ? 'bg-red-600' : percentUsed > 75 ? 'bg-yellow-400' : 'bg-green-600'}`} 
+                className={`h-2 rounded-full ${percentUsed > 90 ? 'bg-red-600' : percentUsed > 75 ? 'bg-yellow-400' : 'bg-green-600'}`} 
                 style={{ width: `${Math.min(percentUsed, 100)}%` }}
               ></div>
             </div>

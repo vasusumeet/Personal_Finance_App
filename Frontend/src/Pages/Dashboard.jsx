@@ -40,11 +40,11 @@ const Dashboard = () => {
   return (
     <div className="bg-gray-900 h-full w-full">
       <Navbar/>
-      <div className="h-full w-full bg-gray-700 flex flex-wrap justify-around p-12">
-        <div className='w-1/4 h-1/4 p-4'>
+      <div className="h-full w-full flex flex-wrap justify-around p-12">
+        <div className='w-1/2 h-1/4 p-4'>
           <BudgetOverview/>
         </div>
-        <div className='w-1/4 h-1/4 p-4'>
+        <div className='w-1/2 h-1/4 p-4'>
           <ExpensesByCategory/>
         </div>
         <div className='w-1/4 h-1/4 p-4'>
