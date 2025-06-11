@@ -24,3 +24,4 @@ dist-ssr
 *.sw?
 
 Backend/node_modules
+Frontend/node_modules
