@@ -25,7 +25,7 @@ const SignUp = () => {
     setLoading(true);
 
     axios
-      .post('https://personal-finance-app-weld.vercel.app/api/auth/signup', data)
+      .post('https://personalfinanceapp-production-3551.up.railway.app/api/auth/signup', data)
       .then((response) => {
         setLoading(false);
         if (response.status === 201) {

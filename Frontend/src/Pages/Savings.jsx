@@ -32,7 +32,7 @@ const Savings = () => {
       try {
         setLoading(true);
         const response = await axios.get(
-          `https://personal-finance-app-weld.vercel.app/api/userdata/${user.id}`,
+          `https://personalfinanceapp-production-3551.up.railway.app/api/userdata/${user.id}`,
           { headers: getAuthHeader() }
         );
         const userData = response.data;
@@ -66,7 +66,7 @@ const Savings = () => {
     
     try {
       const response = await axios.post(
-        `https://personal-finance-app-weld.vercel.app/api/userdata/${user.id}/savings-goals`, 
+        `https://personalfinanceapp-production-3551.up.railway.app/api/userdata/${user.id}/savings-goals`, 
         {
           goalName: formData.goalName,
           targetAmount: parseFloat(formData.targetAmount),
@@ -97,7 +97,7 @@ const Savings = () => {
     
     try {
       const response = await axios.delete(
-        `https://personal-finance-app-weld.vercel.app/api/userdata/${user.id}/savings-goals/${goalId}`,
+        `https://personalfinanceapp-production-3551.up.railway.app/api/userdata/${user.id}/savings-goals/${goalId}`,
         { headers: getAuthHeader() }
       );
       setSavingsGoals(response.data.savingsGoals);

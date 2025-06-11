@@ -24,7 +24,7 @@ const SalaryInfo = () => {
         return;
       }
       const response = await axios.get(
-        `https://personal-finance-app-weld.vercel.app/api/userdata/${user.id}`,
+        `https://personalfinanceapp-production-3551.up.railway.app/api/userdata/${user.id}`,
         {
           headers: {
             Authorization: `Bearer ${token}`

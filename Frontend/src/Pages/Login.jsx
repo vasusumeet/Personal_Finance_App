@@ -15,7 +15,7 @@ const Login = () => {
     setSuccess('');
 
     try {
-      const response = await fetch('https://personal-finance-app-weld.vercel.app/api/auth/login', {
+      const response = await fetch('https://personalfinanceapp-production-3551.up.railway.app/api/auth/login', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
