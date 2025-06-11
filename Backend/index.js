@@ -21,7 +21,7 @@ app.use('/api', dataRoute);
 
 // Use environment variables for config
 const PORT = process.env.PORT || 5000;
-const mongoDBURL = process.env.MONGODB_URL;
+const mongoDBURL = process.env.mongoDBURL;
 
 mongoose
   .connect(mongoDBURL, { useNewUrlParser: true, useUnifiedTopology: true })
