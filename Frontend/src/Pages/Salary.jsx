@@ -10,6 +10,7 @@ const Salary = () => {
   const { user } = useContext(UserContext);
   const [loading, setLoading] = useState(true);
   const [userData, setUserData] = useState(null);
+  const [activeTab, setActiveTab] = useState('salary');
 
   // Form state for salary updates
   const [salaryData, setSalaryData] = useState({
@@ -36,7 +37,6 @@ const Salary = () => {
     if (user && user.id) {
       fetchUserData();
     }
-
   }, [user]);
 
   const fetchUserData = async () => {
@@ -145,163 +145,238 @@ const Salary = () => {
 
   if (loading) {
     return (
-      <div>
+      <div className="bg-gray-900 min-h-screen">
         <Navbar />
-        <div className="max-w-4xl mx-auto mt-10 p-6 bg-white shadow-md rounded-lg">
-          <p className="text-center">Loading salary information...</p>
+        <div className="container mx-auto px-4 py-6 lg:px-8">
+          <div className="bg-gray-800 rounded-lg p-6 text-center">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500 mx-auto mb-4"></div>
+            <p className="text-white">Loading salary information...</p>
+          </div>
         </div>
       </div>
     );
   }
 
   return (
-    <div>
+    <div className="bg-gray-900 min-h-screen">
       <Navbar />
-      <div className="max-w-4xl mx-auto mt-10 p-6 bg-white shadow-md rounded-lg">
-        <h2 className="text-2xl font-semibold text-gray-700 mb-6">Manage Salary & Income</h2>
-
-        {/* Tabs for different sections */}
+      
+      {/* Main Container */}
+      <div className="container mx-auto px-4 py-6 lg:px-8">
+        
+        {/* Page Header */}
         <div className="mb-8">
-          <h3 className="text-xl font-medium text-gray-700 mb-4">Regular Salary Information</h3>
-
-          <form onSubmit={handleSalarySubmit} className="space-y-6">
-            <div className="grid grid-cols-4 gap-4 items-center">
-              <label htmlFor="salary" className="text-gray-600 font-medium">
-                Monthly Salary (₹):
-              </label>
-              <input
-                type="number"
-                id="salary"
-                name="salary"
-                value={salaryData.salary}
-                onChange={handleSalaryChange}
-                className="col-span-3 p-2 border border-gray-300 rounded-md focus:ring focus:ring-blue-300 focus:outline-none"
-                required
-                min="0"
-                placeholder="Enter your monthly salary"
-              />
-            </div>
-
-            <div className="grid grid-cols-4 gap-4 items-center">
-              <label htmlFor="recurringSalary" className="text-gray-600 font-medium">
-                Day of Month (₹):
-              </label>
-              <input
-                type="number"
-                id="recurringSalary"
-                name="recurringSalary"
-                value={salaryData.recurringSalary}
-                onChange={handleSalaryChange}
-                className="col-span-3 p-2 border border-gray-300 rounded-md focus:ring focus:ring-blue-300 focus:outline-none"
-                required
-                min="1"
-                max="31"
-                placeholder="Enter day of month when salary is credited (1-31)"
-              />
-            </div>
-
-            <button
-              type="submit"
-              className="w-full bg-blue-500 text-white py-2 px-4 rounded-md hover:bg-blue-600 transition"
-            >
-              Update Salary Information
-            </button>
-          </form>
-
-          {userData && (
-            <div className="mt-4 p-4 bg-gray-50 rounded-md">
-              <p className="text-gray-700">
-                <span className="font-medium">Current Monthly Salary:</span> ₹{userData.salary ? userData.salary.toFixed(2) : "Not set"}
-              </p>
-              <p className="text-gray-700">
-                <span className="font-medium">Salary Credit Date:</span> {userData.recurringSalary ? `${userData.recurringSalary}${getDaySuffix(userData.recurringSalary)} day of each month` : "Not set"}
-              </p>
-            </div>
-          )}
+          <h1 className="text-2xl md:text-3xl font-bold text-white mb-2">
+            Income Management
+          </h1>
+          <p className="text-gray-400">Manage your salary and track additional income sources</p>
         </div>
 
-        <div className="border-t pt-8">
-          <h3 className="text-xl font-medium text-gray-700 mb-4">Add One-time Income</h3>
+        {/* Tab Navigation */}
+        <div className="mb-8">
+          <div className="flex space-x-1 bg-gray-800 rounded-lg p-1">
+            <button
+              onClick={() => setActiveTab('salary')}
+              className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-colors ${
+                activeTab === 'salary'
+                  ? 'bg-blue-600 text-white'
+                  : 'text-gray-400 hover:text-white hover:bg-gray-700'
+              }`}
+            >
+              Salary Settings
+            </button>
+            <button
+              onClick={() => setActiveTab('income')}
+              className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-colors ${
+                activeTab === 'income'
+                  ? 'bg-blue-600 text-white'
+                  : 'text-gray-400 hover:text-white hover:bg-gray-700'
+              }`}
+            >
+              Add Income
+            </button>
+            <button
+              onClick={() => setActiveTab('history')}
+              className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-colors ${
+                activeTab === 'history'
+                  ? 'bg-blue-600 text-white'
+                  : 'text-gray-400 hover:text-white hover:bg-gray-700'
+              }`}
+            >
+              Income History
+            </button>
+          </div>
+        </div>
 
-          <form onSubmit={handleIncomeSubmit} className="space-y-6">
-            <div className="grid grid-cols-4 gap-4 items-center">
-              <label htmlFor="description" className="text-gray-600 font-medium">
-                Description:
-              </label>
-              <input
-                type="text"
-                id="description"
-                name="description"
-                value={incomeData.description}
-                onChange={handleIncomeChange}
-                className="col-span-3 p-2 border border-gray-300 rounded-md focus:ring focus:ring-blue-300 focus:outline-none"
-                required
-                placeholder="Bonus, Freelance work, etc."
-              />
-            </div>
+        {/* Salary Settings Tab */}
+        {activeTab === 'salary' && (
+          <div className="bg-gray-800 rounded-lg p-4 md:p-6 mb-8">
+            <h2 className="text-xl font-semibold text-white mb-6">Regular Salary Information</h2>
+            
+            {/* Current Salary Display */}
+            {userData && (
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
+                <div className="bg-gray-700 rounded-lg p-4">
+                  <h3 className="text-sm font-medium text-gray-400 mb-1">Current Monthly Salary</h3>
+                  <p className="text-2xl font-bold text-green-400">
+                    ₹{userData.salary ? userData.salary.toLocaleString() : "Not set"}
+                  </p>
+                </div>
+                <div className="bg-gray-700 rounded-lg p-4">
+                  <h3 className="text-sm font-medium text-gray-400 mb-1">Salary Credit Date</h3>
+                  <p className="text-2xl font-bold text-blue-400">
+                    {userData.recurringSalary ? `${userData.recurringSalary}${getDaySuffix(userData.recurringSalary)}` : "Not set"}
+                  </p>
+                </div>
+              </div>
+            )}
 
-            <div className="grid grid-cols-4 gap-4 items-center">
-              <label htmlFor="amount" className="text-gray-600 font-medium">
-                Amount (₹):
-              </label>
-              <input
-                type="number"
-                id="amount"
-                name="amount"
-                value={incomeData.amount}
-                onChange={handleIncomeChange}
-                className="col-span-3 p-2 border border-gray-300 rounded-md focus:ring focus:ring-blue-300 focus:outline-none"
-                required
-                min="0"
-                placeholder="Enter amount"
-              />
-            </div>
+            <form onSubmit={handleSalarySubmit} className="space-y-4 md:space-y-6">
+              {/* Monthly Salary */}
+              <div className="flex flex-col md:grid md:grid-cols-4 md:gap-4 md:items-center">
+                <label htmlFor="salary" className="text-gray-300 font-medium mb-2 md:mb-0">
+                  Monthly Salary (₹):
+                </label>
+                <input
+                  type="number"
+                  id="salary"
+                  name="salary"
+                  value={salaryData.salary}
+                  onChange={handleSalaryChange}
+                  className="md:col-span-3 p-3 bg-gray-700 border border-gray-600 rounded-md text-white placeholder-gray-400 focus:ring-2 focus:ring-blue-500 focus:border-transparent focus:outline-none"
+                  required
+                  min="0"
+                  placeholder="Enter your monthly salary"
+                />
+              </div>
 
-            <div className="grid grid-cols-4 gap-4 items-center">
-              <label htmlFor="date" className="text-gray-600 font-medium">
-                Date:
-              </label>
-              <DatePicker
-                selected={incomeData.date}
-                onChange={handleDateChange}
-                className="col-span-3 p-2 border border-gray-300 rounded-md focus:ring focus:ring-blue-300 focus:outline-none"
-                dateFormat="dd-MM-yy"
-                todayButton="Today"
-                required
-              />
-            </div>
+              {/* Credit Date */}
+              <div className="flex flex-col md:grid md:grid-cols-4 md:gap-4 md:items-center">
+                <label htmlFor="recurringSalary" className="text-gray-300 font-medium mb-2 md:mb-0">
+                  Credit Date (Day of Month):
+                </label>
+                <input
+                  type="number"
+                  id="recurringSalary"
+                  name="recurringSalary"
+                  value={salaryData.recurringSalary}
+                  onChange={handleSalaryChange}
+                  className="md:col-span-3 p-3 bg-gray-700 border border-gray-600 rounded-md text-white placeholder-gray-400 focus:ring-2 focus:ring-blue-500 focus:border-transparent focus:outline-none"
+                  required
+                  min="1"
+                  max="31"
+                  placeholder="Enter day of month (1-31)"
+                />
+              </div>
 
-            <div className="grid grid-cols-4 gap-4 items-center">
-              <label htmlFor="category" className="text-gray-600 font-medium">
-                Category:
-              </label>
-              <select
-                id="category"
-                name="category"
-                value={incomeData.category}
-                onChange={handleIncomeChange}
-                className="col-span-3 p-2 border border-gray-300 rounded-md focus:ring focus:ring-blue-300 focus:outline-none"
-                required
+              <button
+                type="submit"
+                className="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-3 px-6 rounded-md transition-colors duration-200 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:ring-offset-gray-800"
               >
-                <option value="Bonus">Bonus</option>
-                <option value="Freelance">Freelance</option>
-                <option value="Investment">Investment</option>
-                <option value="Gift">Gift</option>
-                <option value="Other">Other</option>
-              </select>
-            </div>
+                Update Salary Information
+              </button>
+            </form>
+          </div>
+        )}
 
-            <button
-              type="submit"
-              className="w-full bg-green-500 text-white py-2 px-4 rounded-md hover:bg-green-600 transition"
-            >
-              Add One-time Income
-            </button>
-          </form>
-        </div>
-      </div>
-      <div>
-        {user && user.id && <IncomeHistory userId={user.id} />}
+        {/* Add Income Tab */}
+        {activeTab === 'income' && (
+          <div className="bg-gray-800 rounded-lg p-4 md:p-6 mb-8">
+            <h2 className="text-xl font-semibold text-white mb-6">Add One-time Income</h2>
+
+            <form onSubmit={handleIncomeSubmit} className="space-y-4 md:space-y-6">
+              {/* Description */}
+              <div className="flex flex-col md:grid md:grid-cols-4 md:gap-4 md:items-center">
+                <label htmlFor="description" className="text-gray-300 font-medium mb-2 md:mb-0">
+                  Description:
+                </label>
+                <input
+                  type="text"
+                  id="description"
+                  name="description"
+                  value={incomeData.description}
+                  onChange={handleIncomeChange}
+                  className="md:col-span-3 p-3 bg-gray-700 border border-gray-600 rounded-md text-white placeholder-gray-400 focus:ring-2 focus:ring-blue-500 focus:border-transparent focus:outline-none"
+                  required
+                  placeholder="Bonus, Freelance work, etc."
+                />
+              </div>
+
+              {/* Amount */}
+              <div className="flex flex-col md:grid md:grid-cols-4 md:gap-4 md:items-center">
+                <label htmlFor="amount" className="text-gray-300 font-medium mb-2 md:mb-0">
+                  Amount (₹):
+                </label>
+                <input
+                  type="number"
+                  id="amount"
+                  name="amount"
+                  value={incomeData.amount}
+                  onChange={handleIncomeChange}
+                  className="md:col-span-3 p-3 bg-gray-700 border border-gray-600 rounded-md text-white placeholder-gray-400 focus:ring-2 focus:ring-blue-500 focus:border-transparent focus:outline-none"
+                  required
+                  min="0"
+                  step="0.01"
+                  placeholder="Enter amount"
+                />
+              </div>
+
+              {/* Date */}
+              <div className="flex flex-col md:grid md:grid-cols-4 md:gap-4 md:items-center">
+                <label htmlFor="date" className="text-gray-300 font-medium mb-2 md:mb-0">
+                  Date:
+                </label>
+                <div className="md:col-span-3">
+                  <DatePicker
+                    selected={incomeData.date}
+                    onChange={handleDateChange}
+                    className="w-full p-3 bg-gray-700 border border-gray-600 rounded-md text-white placeholder-gray-400 focus:ring-2 focus:ring-blue-500 focus:border-transparent focus:outline-none"
+                    dateFormat="dd-MM-yyyy"
+                    todayButton="Today"
+                    required
+                  />
+                </div>
+              </div>
+
+              {/* Category */}
+              <div className="flex flex-col md:grid md:grid-cols-4 md:gap-4 md:items-center">
+                <label htmlFor="category" className="text-gray-300 font-medium mb-2 md:mb-0">
+                  Category:
+                </label>
+                <select
+                  id="category"
+                  name="category"
+                  value={incomeData.category}
+                  onChange={handleIncomeChange}
+                  className="md:col-span-3 p-3 bg-gray-700 border border-gray-600 rounded-md text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent focus:outline-none"
+                  required
+                >
+                  <option value="Bonus">Bonus</option>
+                  <option value="Freelance">Freelance Work</option>
+                  <option value="Investment">Investment Returns</option>
+                  <option value="Gift">Gift Money</option>
+                  <option value="Side Hustle">Side Hustle</option>
+                  <option value="Other">Other</option>
+                </select>
+              </div>
+
+              <button
+                type="submit"
+                className="w-full bg-green-600 hover:bg-green-700 text-white font-medium py-3 px-6 rounded-md transition-colors duration-200 focus:ring-2 focus:ring-green-500 focus:ring-offset-2 focus:ring-offset-gray-800"
+              >
+                Add Income
+              </button>
+            </form>
+          </div>
+        )}
+
+        {/* Income History Tab */}
+        {activeTab === 'history' && (
+          <div className="bg-gray-800 rounded-lg p-4 md:p-6">
+            <h2 className="text-xl font-semibold text-white mb-6">Income History</h2>
+            {user && user.id && <IncomeHistory userId={user.id} />}
+          </div>
+        )}
       </div>
     </div>
   );
