@@ -8,7 +8,13 @@ import cors from 'cors';
 dotenv.config();
 
 const app = express();
-app.use(cors());
+const allowedOrigins = [
+  'https://personal-finance-app-front-gvvglipfj-vasu-sumeet-seths-projects.vercel.app', 
+];
+app.use(cors({
+  origin: allowedOrigins,
+  credentials: true
+}));
 app.use(express.json());
 
 app.get('/', (req, res) => {
