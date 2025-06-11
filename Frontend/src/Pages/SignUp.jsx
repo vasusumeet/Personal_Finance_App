@@ -269,13 +269,6 @@ const SignUp = () => {
                 </div>
               )}
 
-              {/* Terms and Privacy */}
-              <div className="text-xs text-gray-400 text-center">
-                By creating an account, you agree to our{' '}
-                <span className="text-green-400 hover:text-green-300 cursor-pointer">Terms of Service</span>
-                {' '}and{' '}
-                <span className="text-green-400 hover:text-green-300 cursor-pointer">Privacy Policy</span>
-              </div>
 
               {/* SignUp Button */}
               <button
@@ -320,7 +313,7 @@ const SignUp = () => {
           {/* Security Notice */}
           <div className="mt-6 text-center">
             <p className="text-gray-500 text-xs">
-              🔒 Your information is encrypted and secure
+               Your information is encrypted and secure
             </p>
           </div>
         </div>
