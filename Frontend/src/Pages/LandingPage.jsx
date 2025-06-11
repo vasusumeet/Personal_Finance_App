@@ -132,22 +132,6 @@ const LandingPage = () => {
             No credit card required • Free to start • Secure & encrypted
           </p>
         </div>
-
-        {/* Stats or testimonials */}
-        <div className="mt-16 grid grid-cols-1 md:grid-cols-3 gap-8 text-center max-w-4xl mx-auto">
-          <div>
-            <div className="text-2xl md:text-3xl font-bold text-blue-400 mb-2">10K+</div>
-            <div className="text-gray-300 text-sm md:text-base">Active Users</div>
-          </div>
-          <div>
-            <div className="text-2xl md:text-3xl font-bold text-green-400 mb-2">$2M+</div>
-            <div className="text-gray-300 text-sm md:text-base">Money Tracked</div>
-          </div>
-          <div>
-            <div className="text-2xl md:text-3xl font-bold text-purple-400 mb-2">95%</div>
-            <div className="text-gray-300 text-sm md:text-base">User Satisfaction</div>
-          </div>
-        </div>
       </div>
     </div>
   );
