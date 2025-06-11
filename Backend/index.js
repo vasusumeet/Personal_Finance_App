@@ -6,7 +6,8 @@ import dataRoute from "./routes/dataRoute.js";
 import cors from 'cors';
 
 dotenv.config();
-
+const app = express();
+app.use(express.json());
 // Use uppercase and underscores for environment variables (recommended for Vercel)
 const PORT = process.env.PORT || 5000;
 const mongoDBURL = process.env.mongoDBURL; // Make sure this matches your Vercel env var exactly!
@@ -27,8 +28,7 @@ app.use(cors({
 // Ensure preflight requests are handled
 app.options('*', cors());
 
-const app = express();
-app.use(express.json());
+
 
 app.get('/', (req, res) => {
   console.log('request received on /');
