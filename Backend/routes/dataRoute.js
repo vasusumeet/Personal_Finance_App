@@ -3,9 +3,6 @@ import mongoose from 'mongoose';
 import { UserData } from '../models/UserData.js';
 import authenticate from '../middleware/authMiddleware.js';
 
-
-
-
 const dataRoute = express.Router();
 
 // Apply the JWT middleware to all routes in this router
@@ -115,10 +112,10 @@ dataRoute.delete('/userdata/:userId/income/:incomeId', async (req, res) => {
     }
 });
 
-// Post Expense
+// Post Expense (now supports paymentMethod)
 dataRoute.post('/userdata/:userId/expenses', async (req, res) => {
     const { userId } = req.params;
-    const { description, amount, date, category } = req.body;
+    const { description, amount, date, category, paymentMethod } = req.body;
     const forbidden = checkOwnership(req, res, userId);
     if (forbidden) return;
 
@@ -130,7 +127,7 @@ dataRoute.post('/userdata/:userId/expenses', async (req, res) => {
         }
 
         if (!userData.expenses) userData.expenses = [];
-        userData.expenses.push({ description, amount, date, category });
+        userData.expenses.push({ description, amount, date, category, paymentMethod });
 
         await userData.save();
         res.status(200).json(userData);
@@ -139,10 +136,11 @@ dataRoute.post('/userdata/:userId/expenses', async (req, res) => {
         res.status(500).json({ message: 'Error adding expense', error });
     }
 });
-// Edit an expense
+
+// Edit an expense (now supports paymentMethod)
 dataRoute.put('/userdata/:userId/expenses/:expenseId/editexp', async (req, res) => {
     const { userId, expenseId } = req.params;
-    const { description, amount, date, category } = req.body;
+    const { description, amount, date, category, paymentMethod } = req.body;
     const forbidden = checkOwnership(req, res, userId);
     if (forbidden) return;
 
@@ -157,17 +155,50 @@ dataRoute.put('/userdata/:userId/expenses/:expenseId/editexp', async (req, res) 
             return res.status(404).json({ message: 'Expense not found' });
         }
 
-        // Update the fields
         if (description !== undefined) expense.description = description;
         if (amount !== undefined) expense.amount = amount;
         if (date !== undefined) expense.date = date;
         if (category !== undefined) expense.category = category;
+        if (paymentMethod !== undefined) expense.paymentMethod = paymentMethod;
 
         await userData.save();
         res.status(200).json({ message: 'Expense updated successfully', expense });
     } catch (error) {
         console.error('Error editing expense:', error);
         res.status(500).json({ message: 'Error editing expense', error });
+    }
+});
+
+// Update Expense (now supports paymentMethod)
+dataRoute.put('/userdata/:userId/expenses/:expenseId', async (req, res) => {
+    const { userId, expenseId } = req.params;
+    const { description, amount, date, category, paymentMethod } = req.body;
+    const forbidden = checkOwnership(req, res, userId);
+    if (forbidden) return;
+
+    try {
+        const userData = await UserData.findOne({ userId });
+
+        if (!userData) {
+            return res.status(404).json({ message: 'User data not found' });
+        }
+
+        const expense = userData.expenses.id(expenseId);
+        if (!expense) {
+            return res.status(404).json({ message: 'Expense not found' });
+        }
+
+        expense.description = description;
+        expense.amount = amount;
+        expense.date = date;
+        expense.category = category;
+        if (paymentMethod !== undefined) expense.paymentMethod = paymentMethod;
+
+        await userData.save();
+        res.status(200).json(userData);
+    } catch (error) {
+        console.error('Error updating expense:', error);
+        res.status(500).json({ message: 'Error updating expense', error });
     }
 });
 
@@ -198,6 +229,100 @@ dataRoute.delete('/userdata/:userId/expenses/:expenseId/deleteexp', async (req, 
 });
 
 
+dataRoute.delete('/userdata/:userId/expenses/:expenseId', async (req, res) => {
+    const { userId, expenseId } = req.params;
+    const forbidden = checkOwnership(req, res, userId);
+    if (forbidden) return;
+
+    try {
+        const userData = await UserData.findOne({ userId });
+
+        if (!userData) {
+            return res.status(404).json({ message: 'User data not found' });
+        }
+
+        userData.expenses = userData.expenses.filter(exp => exp._id.toString() !== expenseId);
+        await userData.save();
+
+        res.status(200).json(userData);
+    } catch (error) {
+        console.error('Error deleting expense:', error);
+        res.status(500).json({ message: 'Error deleting expense', error });
+    }
+});
+
+// Fetch Expenses (paginated, returns paymentMethod as part of each expense)
+dataRoute.get('/userdata/:userId/expensehis', async (req, res) => {
+    const userId = req.params.userId;
+    const forbidden = checkOwnership(req, res, userId);
+    if (forbidden) return;
+
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 5;
+    const skip = (page - 1) * limit;
+
+    try {
+        const userData = await UserData.findOne({ userId });
+
+        if (!userData) {
+            return res.status(404).json({ message: 'User data not found' });
+        }
+
+        const expenses = userData.expenses || [];
+        const total = expenses.length;
+
+        const paginatedExpenses = expenses
+            .sort((a, b) => new Date(b.date) - new Date(a.date))
+            .slice(skip, skip + limit);
+
+        res.json({
+            expenses: paginatedExpenses,
+            total,
+            page,
+            totalPages: Math.ceil(total / limit)
+        });
+    } catch (error) {
+        console.error('Error fetching expenses:', error);
+        res.status(500).json({ message: 'Error fetching expenses' });
+    }
+});
+
+// Fetch Income (paginated)
+dataRoute.get('/userdata/:userId/incomehis', async (req, res) => {
+    const userId = req.params.userId;
+    const forbidden = checkOwnership(req, res, userId);
+    if (forbidden) return;
+
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 5;
+    const skip = (page - 1) * limit;
+
+    try {
+        const userData = await UserData.findOne({ userId });
+
+        if (!userData) {
+            return res.status(404).json({ message: 'User data not found' });
+        }
+
+        const income = userData.income || [];
+        const total = income.length;
+
+        const paginatedIncome = income
+            .sort((a, b) => new Date(b.date) - new Date(a.date))
+            .slice(skip, skip + limit);
+
+        res.json({
+            income: paginatedIncome,
+            total,
+            page,
+            totalPages: Math.ceil(total / limit)
+        });
+    } catch (error) {
+        console.error('Error fetching Income:', error);
+        res.status(500).json({ message: 'Error fetching Income' });
+    }
+});
+
 // Add Savings Goal
 dataRoute.post('/userdata/:userId/savings-goals', async (req, res) => {
     const { userId } = req.params;
@@ -220,81 +345,6 @@ dataRoute.post('/userdata/:userId/savings-goals', async (req, res) => {
     } catch (error) {
         console.error('Error adding savings goal:', error);
         res.status(500).json({ message: 'Error adding savings goal', error });
-    }
-});
-
-// Fetch User Data
-dataRoute.get('/userdata/:userId', async (req, res) => {
-    const { userId } = req.params;
-    const forbidden = checkOwnership(req, res, userId);
-    if (forbidden) return;
-
-    try {
-        const userData = await UserData.findOne({ userId });
-
-        if (!userData) {
-            return res.status(404).json({ message: 'User data not found' });
-        }
-
-        res.status(200).json(userData);
-    } catch (error) {
-        console.error('Error retrieving user data:', error);
-        res.status(500).json({ message: 'Error retrieving user data', error });
-    }
-});
-
-// Update Expense
-dataRoute.put('/userdata/:userId/expenses/:expenseId', async (req, res) => {
-    const { userId, expenseId } = req.params;
-    const { description, amount, date, category } = req.body;
-    const forbidden = checkOwnership(req, res, userId);
-    if (forbidden) return;
-
-    try {
-        const userData = await UserData.findOne({ userId });
-
-        if (!userData) {
-            return res.status(404).json({ message: 'User data not found' });
-        }
-
-        const expense = userData.expenses.id(expenseId);
-        if (!expense) {
-            return res.status(404).json({ message: 'Expense not found' });
-        }
-
-        expense.description = description;
-        expense.amount = amount;
-        expense.date = date;
-        expense.category = category;
-
-        await userData.save();
-        res.status(200).json(userData);
-    } catch (error) {
-        console.error('Error updating expense:', error);
-        res.status(500).json({ message: 'Error updating expense', error });
-    }
-});
-
-// Delete Expense
-dataRoute.delete('/userdata/:userId/expenses/:expenseId', async (req, res) => {
-    const { userId, expenseId } = req.params;
-    const forbidden = checkOwnership(req, res, userId);
-    if (forbidden) return;
-
-    try {
-        const userData = await UserData.findOne({ userId });
-
-        if (!userData) {
-            return res.status(404).json({ message: 'User data not found' });
-        }
-
-        userData.expenses = userData.expenses.filter(exp => exp._id.toString() !== expenseId);
-        await userData.save();
-
-        res.status(200).json(userData);
-    } catch (error) {
-        console.error('Error deleting expense:', error);
-        res.status(500).json({ message: 'Error deleting expense', error });
     }
 });
 
@@ -453,15 +503,11 @@ dataRoute.post('/userdata/:userId/end-of-month-savings', async (req, res) => {
     }
 });
 
-// Fetch Expenses (paginated)
-dataRoute.get('/userdata/:userId/expensehis', async (req, res) => {
-    const userId = req.params.userId;
+// Fetch User Data
+dataRoute.get('/userdata/:userId', async (req, res) => {
+    const { userId } = req.params;
     const forbidden = checkOwnership(req, res, userId);
     if (forbidden) return;
-
-    const page = parseInt(req.query.page) || 1;
-    const limit = parseInt(req.query.limit) || 5;
-    const skip = (page - 1) * limit;
 
     try {
         const userData = await UserData.findOne({ userId });
@@ -470,58 +516,10 @@ dataRoute.get('/userdata/:userId/expensehis', async (req, res) => {
             return res.status(404).json({ message: 'User data not found' });
         }
 
-        const expenses = userData.expenses || [];
-        const total = expenses.length;
-
-        const paginatedExpenses = expenses
-            .sort((a, b) => new Date(b.date) - new Date(a.date))
-            .slice(skip, skip + limit);
-
-        res.json({
-            expenses: paginatedExpenses,
-            total,
-            page,
-            totalPages: Math.ceil(total / limit)
-        });
+        res.status(200).json(userData);
     } catch (error) {
-        console.error('Error fetching expenses:', error);
-        res.status(500).json({ message: 'Error fetching expenses' });
-    }
-});
-
-// Fetch Income (paginated)
-dataRoute.get('/userdata/:userId/incomehis', async (req, res) => {
-    const userId = req.params.userId;
-    const forbidden = checkOwnership(req, res, userId);
-    if (forbidden) return;
-
-    const page = parseInt(req.query.page) || 1;
-    const limit = parseInt(req.query.limit) || 5;
-    const skip = (page - 1) * limit;
-
-    try {
-        const userData = await UserData.findOne({ userId });
-
-        if (!userData) {
-            return res.status(404).json({ message: 'User data not found' });
-        }
-
-        const income = userData.income || [];
-        const total = income.length;
-
-        const paginatedIncome = income
-            .sort((a, b) => new Date(b.date) - new Date(a.date))
-            .slice(skip, skip + limit);
-
-        res.json({
-            income: paginatedIncome,
-            total,
-            page,
-            totalPages: Math.ceil(total / limit)
-        });
-    } catch (error) {
-        console.error('Error fetching Income:', error);
-        res.status(500).json({ message: 'Error fetching Income' });
+        console.error('Error retrieving user data:', error);
+        res.status(500).json({ message: 'Error retrieving user data', error });
     }
 });
 
