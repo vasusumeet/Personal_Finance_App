@@ -42,7 +42,7 @@ const Expenses = () => {
 
     try {
       const response = await axios.post(
-        `miraculous-beauty-production.up.railway.app/api/userdata/${user.id}/expenses`, 
+        `https://miraculous-beauty-production.up.railway.app/api/userdata/${user.id}/expenses`, 
         {
           description: formData.description, 
           amount: parseFloat(formData.amount),

@@ -43,7 +43,7 @@ const Salary = () => {
     try {
       setLoading(true);
       const response = await axios.get(
-        `miraculous-beauty-production.up.railway.app/api/userdata/${user.id}`,
+        `https://miraculous-beauty-production.up.railway.app/api/userdata/${user.id}`,
         { headers: getAuthHeader() }
       );
       setUserData(response.data);
@@ -88,7 +88,7 @@ const Salary = () => {
 
     try {
       const response = await axios.post(
-        `miraculous-beauty-production.up.railway.app/api/userdata`,
+        `https://miraculous-beauty-production.up.railway.app/api/userdata`,
         {
           userId: user.id,
           username: user.username || userData?.username,
@@ -117,7 +117,7 @@ const Salary = () => {
 
     try {
       const response = await axios.post(
-        `miraculous-beauty-production.up.railway.app/api/userdata/${user.id}/income`,
+        `https://miraculous-beauty-production.up.railway.app/api/userdata/${user.id}/income`,
         {
           description: incomeData.description,
           amount: parseFloat(incomeData.amount),

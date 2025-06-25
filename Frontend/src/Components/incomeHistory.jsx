@@ -16,7 +16,7 @@ const IncomeHistory = ({ userId }) => {
           return;
         }
         const response = await axios.get(
-          `miraculous-beauty-production.up.railway.app/api/userdata/${userId}/incomehis`,
+          `https://miraculous-beauty-production.up.railway.app/api/userdata/${userId}/incomehis`,
           {
             params: {
               page: currentPage,

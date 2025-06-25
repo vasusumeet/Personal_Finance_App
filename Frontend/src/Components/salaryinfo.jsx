@@ -24,7 +24,7 @@ const SalaryInfo = () => {
         return;
       }
       const response = await axios.get(
-        `miraculous-beauty-production.up.railway.app/api/userdata/${user.id}`,
+        `https://miraculous-beauty-production.up.railway.app/api/userdata/${user.id}`,
         {
           headers: {
             Authorization: `Bearer ${token}`

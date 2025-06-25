@@ -24,7 +24,7 @@ const ExpenseHistory = ({ userId }) => {
     const fetchExpenses = async () => {
       try {
         const response = await axios.get(
-          `miraculous-beauty-production.up.railway.app/api/userdata/${userId}/expensehis`,
+          `https://miraculous-beauty-production.up.railway.app/api/userdata/${userId}/expensehis`,
           {
             params: {
               page: currentPage,
@@ -54,7 +54,7 @@ const ExpenseHistory = ({ userId }) => {
   const handleDeleteExp = async () => {
     try {
       await axios.delete(
-        `miraculous-beauty-production.up.railway.app/api/userdata/${userId}/expenses/${pendingDeleteId}/deleteexp`,
+        `https://miraculous-beauty-production.up.railway.app/api/userdata/${userId}/expenses/${pendingDeleteId}/deleteexp`,
         { headers: getAuthHeader() }
       );
       setExpense((prev) => prev.filter((exp) => exp._id !== pendingDeleteId));
@@ -79,7 +79,7 @@ const ExpenseHistory = ({ userId }) => {
   const handleEditExp = async (form) => {
     try {
       await axios.put(
-        `miraculous-beauty-production.up.railway.app/api/userdata/${userId}/expenses/${pendingEditExp._id}/editexp`,
+        `https://miraculous-beauty-production.up.railway.app/api/userdata/${userId}/expenses/${pendingEditExp._id}/editexp`,
         {
           ...pendingEditExp,
           ...form,
