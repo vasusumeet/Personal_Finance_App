@@ -45,7 +45,7 @@ const BudgetOverview = () => {
           setLoading(false);
           return;
         }
-        const response = await axios.get(`https://personalfinanceapp-production-3551.up.railway.app/api/userdata/${user.id}`, {
+        const response = await axios.get(`miraculous-beauty-production.up.railway.app/api/userdata/${user.id}`, {
           headers: {
             Authorization: `Bearer ${token}`
           }

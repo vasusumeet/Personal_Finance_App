@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import ConfirmDialog from "./confirmdialog";
 import EditDialog from "./editdialog";
+
 const ExpenseHistory = ({ userId }) => {
   const [expense, setExpense] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
@@ -23,7 +24,7 @@ const ExpenseHistory = ({ userId }) => {
     const fetchExpenses = async () => {
       try {
         const response = await axios.get(
-          `https://personalfinanceapp-production-3551.up.railway.app/api/userdata/${userId}/expensehis`,
+          `miraculous-beauty-production.up.railway.app/api/userdata/${userId}/expensehis`,
           {
             params: {
               page: currentPage,
@@ -53,7 +54,7 @@ const ExpenseHistory = ({ userId }) => {
   const handleDeleteExp = async () => {
     try {
       await axios.delete(
-        `https://personalfinanceapp-production-3551.up.railway.app/api/userdata/${userId}/expenses/${pendingDeleteId}/deleteexp`,
+        `miraculous-beauty-production.up.railway.app/api/userdata/${userId}/expenses/${pendingDeleteId}/deleteexp`,
         { headers: getAuthHeader() }
       );
       setExpense((prev) => prev.filter((exp) => exp._id !== pendingDeleteId));
@@ -78,7 +79,7 @@ const ExpenseHistory = ({ userId }) => {
   const handleEditExp = async (form) => {
     try {
       await axios.put(
-        `https://personalfinanceapp-production-3551.up.railway.app/api/userdata/${userId}/expenses/${pendingEditExp._id}/editexp`,
+        `miraculous-beauty-production.up.railway.app/api/userdata/${userId}/expenses/${pendingEditExp._id}/editexp`,
         {
           ...pendingEditExp,
           ...form,
@@ -115,6 +116,7 @@ const ExpenseHistory = ({ userId }) => {
               <th className="p-3 text-left border">Date</th>
               <th className="p-3 text-left border">Description</th>
               <th className="p-3 text-left border">Category</th>
+              <th className="p-3 text-left border">Payment Method</th>
               <th className="p-3 text-right border">Amount</th>
               <th className="p-3 text-right border">Action</th>
             </tr>
@@ -128,6 +130,7 @@ const ExpenseHistory = ({ userId }) => {
                   </td>
                   <td className="p-3 border">{exp.description}</td>
                   <td className="p-3 border">{exp.category}</td>
+                  <td className="p-3 border">{exp.paymentMethod || <span className="text-gray-400">-</span>}</td>
                   <td className="p-3 text-right border">
                     {exp.amount.toFixed(2)}
                   </td>
@@ -149,7 +152,7 @@ const ExpenseHistory = ({ userId }) => {
               ))
             ) : (
               <tr>
-                <td colSpan="5" className="p-3 text-center">
+                <td colSpan="6" className="p-3 text-center">
                   No expenses found
                 </td>
               </tr>

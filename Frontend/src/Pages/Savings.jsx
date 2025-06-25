@@ -33,7 +33,7 @@ const Savings = () => {
       try {
         setLoading(true);
         const response = await axios.get(
-          `https://personalfinanceapp-production-3551.up.railway.app/api/userdata/${user.id}`,
+          `miraculous-beauty-production.up.railway.app/api/userdata/${user.id}`,
           { headers: getAuthHeader() }
         );
         const userData = response.data;
@@ -67,7 +67,7 @@ const Savings = () => {
     
     try {
       const response = await axios.post(
-        `https://personalfinanceapp-production-3551.up.railway.app/api/userdata/${user.id}/savings-goals`, 
+        `miraculous-beauty-production.up.railway.app/api/userdata/${user.id}/savings-goals`, 
         {
           goalName: formData.goalName,
           targetAmount: parseFloat(formData.targetAmount),
@@ -99,7 +99,7 @@ const Savings = () => {
     
     try {
       const response = await axios.delete(
-        `https://personalfinanceapp-production-3551.up.railway.app/api/userdata/${user.id}/savings-goals/${goalId}`,
+        `miraculous-beauty-production.up.railway.app/api/userdata/${user.id}/savings-goals/${goalId}`,
         { headers: getAuthHeader() }
       );
       setSavingsGoals(response.data.savingsGoals);
