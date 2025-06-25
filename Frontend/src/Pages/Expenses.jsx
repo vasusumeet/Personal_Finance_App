@@ -14,6 +14,7 @@ const Expenses = () => {
     amount: "",
     category: "Misc",
     date: new Date(),
+    paymentMethod: "", // Added default value
   });
 
   const handleChange = (e) => {
@@ -47,6 +48,7 @@ const Expenses = () => {
           amount: parseFloat(formData.amount),
           category: formData.category,
           date: formData.date.toISOString().split("T")[0],
+          paymentMethod: formData.paymentMethod,
         },
         {
           headers: {
@@ -63,6 +65,7 @@ const Expenses = () => {
         amount: "",
         category: "Misc",
         date: new Date(),
+        paymentMethod: ""
       });
     } catch (error) {
       console.error("Error posting expense:", error.response?.data || error.message);
@@ -141,6 +144,27 @@ const Expenses = () => {
                   required
                 />
               </div>
+            </div>
+
+            {/* Payment Method Field */}
+            <div className="flex flex-col md:grid md:grid-cols-4 md:gap-4 md:items-center">
+              <label htmlFor="paymentMethod" className="text-gray-300 font-medium mb-2 md:mb-0">
+                Payment Method:
+              </label>
+              <select
+                id="paymentMethod"
+                name="paymentMethod"
+                value={formData.paymentMethod}
+                onChange={handleChange}
+                className="md:col-span-3 p-3 bg-gray-700 border border-gray-600 rounded-md text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent focus:outline-none"
+                required
+              >
+                <option value="">Select Payment Method</option>
+                <option value="UPI">UPI</option>
+                <option value="Credit Card">Credit Card</option>
+                <option value="Debit Card">Debit Card</option>
+                <option value="Cash">Cash</option>
+              </select>
             </div>
 
             {/* Category Field */}
