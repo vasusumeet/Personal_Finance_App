@@ -61,7 +61,7 @@ const SignUp = () => {
 
     try {
       const response = await axios.post(
-        'https://miraculous-beauty-production.up.railway.app//api/auth/signup', 
+        'https://miraculous-beauty-production.up.railway.app/api/auth/signup', 
         data
       );
 
