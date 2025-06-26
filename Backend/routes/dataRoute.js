@@ -617,7 +617,7 @@ dataRoute.put('/userdata/:userId/suggestion', async (req, res) => {
     }
 });
 // Update Savings Goal and current value
-app.put('/userdata/:userId/savings-goals/:goalId/update', async (req, res) => {
+dataRoute.put('/userdata/:userId/savings-goals/:goalId/update', async (req, res) => {
     const { userId, goalId } = req.params;
     const { goalName, targetAmount, currentAmount, deadline } = req.body;
     const forbidden = checkOwnership(req, res, userId);
