@@ -23,6 +23,5 @@ dist-ssr
 *.sln
 *.sw?
 
-Backend/config.js
- 
- 
+Backend/node_modules
+Frontend/node_modules

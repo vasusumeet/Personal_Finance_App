@@ -13,10 +13,11 @@ const IncomeList = () => {
     }
   }, [user]);
 
+  
   const fetchIncomeData = async () => {
     try {
       setLoading(true);
-      const response = await axios.get(`http://localhost:5555/api/userdata/${user._id}/income`);
+      const response = await axios.get(`https://miraculous-beauty-production.up.railway.app/api/userdata/${user._id}/income`);
       setIncomeEntries(response.data);
       setLoading(false);
     } catch (error) {
@@ -28,7 +29,7 @@ const IncomeList = () => {
   const handleDelete = async (incomeId) => {
     if (window.confirm("Are you sure you want to delete this income entry?")) {
       try {
-        await axios.delete(`http://localhost:5555/api/userdata/${user._id}/income/${incomeId}`);
+        await axios.delete(`https://miraculous-beauty-production.up.railway.app/api/userdata/${user._id}/income/${incomeId}`);
         fetchIncomeData(); // Refresh list after deletion
       } catch (error) {
         console.error("Error deleting income entry:", error);

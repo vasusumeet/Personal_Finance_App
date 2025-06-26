@@ -31,7 +31,7 @@ const ExpensesByCategory = () => {
           setLoading(false);
           return;
         }
-        const response = await axios.get(`http://localhost:5555/api/userdata/${user.id}`, {
+        const response = await axios.get(`https://miraculous-beauty-production.up.railway.app/api/userdata/${user.id}`, {
           headers: {
             Authorization: `Bearer ${token}`
           }

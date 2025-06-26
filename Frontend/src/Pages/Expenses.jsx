@@ -14,6 +14,7 @@ const Expenses = () => {
     amount: "",
     category: "Misc",
     date: new Date(),
+    paymentMethod: "", // Added default value
   });
 
   const handleChange = (e) => {
@@ -33,7 +34,6 @@ const Expenses = () => {
       return;
     }
 
-    // Get JWT token from localStorage
     const token = localStorage.getItem('token');
     if (!token) {
       alert("Authentication token missing. Please log in again.");
@@ -42,12 +42,13 @@ const Expenses = () => {
 
     try {
       const response = await axios.post(
-        `http://localhost:5555/api/userdata/${user.id}/expenses`, 
+        `https://miraculous-beauty-production.up.railway.app/api/userdata/${user.id}/expenses`, 
         {
           description: formData.description, 
           amount: parseFloat(formData.amount),
           category: formData.category,
           date: formData.date.toISOString().split("T")[0],
+          paymentMethod: formData.paymentMethod,
         },
         {
           headers: {
@@ -59,12 +60,12 @@ const Expenses = () => {
       alert("Expense added successfully!");
       console.log(response.data);
       
-      // Reset form after successful submission
       setFormData({
         description: "",
         amount: "",
         category: "Misc",
         date: new Date(),
+        paymentMethod: ""
       });
     } catch (error) {
       console.error("Error posting expense:", error.response?.data || error.message);
@@ -73,87 +74,147 @@ const Expenses = () => {
   };
 
   return (
-    <div>
-      <Navbar/>
-      <div className="max-w-4xl mt-10 p-6 bg-white shadow-md rounded-lg">
-        <h2 className="text-2xl font-semibold text-gray-700 mb-6">Create Expense</h2>
-        <form onSubmit={handleSubmit} className="space-y-6">
-          <div className="grid grid-cols-4 gap-4 items-center">
-            <label htmlFor="description" className="text-gray-600 font-medium">
-              Description:
-            </label>
-            <input
-              type="text"
-              id="description"
-              name="description"
-              value={formData.description}
-              onChange={handleChange}
-              className="col-span-3 p-2 border border-gray-300 rounded-md focus:ring focus:ring-blue-300 focus:outline-none"
-              required
-            />
-          </div>
-          <div className="grid grid-cols-4 gap-4 items-center">
-            <label htmlFor="amount" className="text-gray-600 font-medium">
-              Amount:
-            </label>
-            <input
-              type="number"
-              id="amount"
-              name="amount"
-              value={formData.amount}
-              onChange={handleChange}
-              className="col-span-3 p-2 border border-gray-300 rounded-md focus:ring focus:ring-blue-300 focus:outline-none"
-              required
-            />
-          </div>
-          <div className="grid grid-cols-4 gap-4 items-center">
-            <label htmlFor="date" className="text-gray-600 font-medium">
-              Date:
-            </label>
-            <DatePicker
-              selected={formData.date}
-              onChange={handleDateChange}
-              className="col-span-3 p-2 border border-gray-300 rounded-md focus:ring focus:ring-blue-300 focus:outline-none"
-              dateFormat="dd-MM-yy"
-              todayButton="Today"
-              required
-            />
-          </div>
-          <div className="grid grid-cols-4 gap-4 items-center">
-            <label htmlFor="category" className="text-gray-600 font-medium">
-              Category:
-            </label>
-            <select
-              id="category"
-              name="category"
-              value={formData.category}
-              onChange={handleChange}
-              className="col-span-3 p-2 border border-gray-300 rounded-md focus:ring focus:ring-blue-300 focus:outline-none"
-              required
-            >
-              <option value="Misc">Misc</option>
-              <option value="Bills">Bills</option>
-              <option value="Food">Food</option>
-              <option value="Grocery">Grocery</option>
-              <option value="Random">Random</option>
-            </select>
+    <div className="bg-gray-900 min-h-screen">
+      <Navbar />
+      
+      {/* Main Container */}
+      <div className="container mx-auto px-4 py-6 lg:px-8">
+        
+        {/* Page Header */}
+        <div className="mb-8">
+          <h1 className="text-2xl md:text-3xl font-bold text-white mb-2">
+            Manage Expenses
+          </h1>
+          <p className="text-gray-400">Track and categorize your spending</p>
+        </div>
+
+        {/* Expense Form */}
+        <div className="bg-gray-800 rounded-lg p-4 md:p-6 mb-8 shadow-lg">
+          <h2 className="text-xl font-semibold text-white mb-6">Add New Expense</h2>
+          
+          <form onSubmit={handleSubmit} className="space-y-4 md:space-y-6">
+            {/* Description Field */}
+            <div className="flex flex-col md:grid md:grid-cols-4 md:gap-4 md:items-center">
+              <label htmlFor="description" className="text-gray-300 font-medium mb-2 md:mb-0">
+                Description:
+              </label>
+              <input
+                type="text"
+                id="description"
+                name="description"
+                value={formData.description}
+                onChange={handleChange}
+                className="md:col-span-3 p-3 bg-gray-700 border border-gray-600 rounded-md text-white placeholder-gray-400 focus:ring-2 focus:ring-blue-500 focus:border-transparent focus:outline-none"
+                placeholder="Enter expense description"
+                required
+              />
+            </div>
+
+            {/* Amount Field */}
+            <div className="flex flex-col md:grid md:grid-cols-4 md:gap-4 md:items-center">
+              <label htmlFor="amount" className="text-gray-300 font-medium mb-2 md:mb-0">
+                Amount:
+              </label>
+              <input
+                type="number"
+                id="amount"
+                name="amount"
+                value={formData.amount}
+                onChange={handleChange}
+                className="md:col-span-3 p-3 bg-gray-700 border border-gray-600 rounded-md text-white placeholder-gray-400 focus:ring-2 focus:ring-blue-500 focus:border-transparent focus:outline-none"
+                placeholder="0.00"
+                step="0.01"
+                min="0"
+                required
+              />
+            </div>
+
+            {/* Date Field */}
+            <div className="flex flex-col md:grid md:grid-cols-4 md:gap-4 md:items-center">
+              <label htmlFor="date" className="text-gray-300 font-medium mb-2 md:mb-0">
+                Date:
+              </label>
+              <div className="md:col-span-3">
+                <DatePicker
+                  selected={formData.date}
+                  onChange={handleDateChange}
+                  className="w-full p-3 bg-gray-700 border border-gray-600 rounded-md text-white placeholder-gray-400 focus:ring-2 focus:ring-blue-500 focus:border-transparent focus:outline-none"
+                  dateFormat="dd-MM-yyyy"
+                  todayButton="Today"
+                  required
+                />
+              </div>
+            </div>
+
+            {/* Payment Method Field */}
+            <div className="flex flex-col md:grid md:grid-cols-4 md:gap-4 md:items-center">
+              <label htmlFor="paymentMethod" className="text-gray-300 font-medium mb-2 md:mb-0">
+                Payment Method:
+              </label>
+              <select
+                id="paymentMethod"
+                name="paymentMethod"
+                value={formData.paymentMethod}
+                onChange={handleChange}
+                className="md:col-span-3 p-3 bg-gray-700 border border-gray-600 rounded-md text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent focus:outline-none"
+                required
+              >
+                <option value="">Select Payment Method</option>
+                <option value="UPI">UPI</option>
+                <option value="Credit Card">Credit Card</option>
+                <option value="Debit Card">Debit Card</option>
+                <option value="Cash">Cash</option>
+              </select>
+            </div>
+
+            {/* Category Field */}
+            <div className="flex flex-col md:grid md:grid-cols-4 md:gap-4 md:items-center">
+              <label htmlFor="category" className="text-gray-300 font-medium mb-2 md:mb-0">
+                Category:
+              </label>
+              <select
+                id="category"
+                name="category"
+                value={formData.category}
+                onChange={handleChange}
+                className="md:col-span-3 p-3 bg-gray-700 border border-gray-600 rounded-md text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent focus:outline-none"
+                required
+              >
+                <option value="Misc">Miscellaneous</option>
+                <option value="Bills">Bills & Utilities</option>
+                <option value="Food">Food & Dining</option>
+                <option value="Grocery">Grocery</option>
+                <option value="Transportation">Transportation</option>
+                <option value="Entertainment">Entertainment</option>
+                <option value="Healthcare">Healthcare</option>
+                <option value="Shopping">Shopping</option>
+                <option value="Random">Random</option>
+              </select>
+            </div>
+            
+            {/* Submit Button */}
+            <div className="pt-4">
+              <button
+                type="submit"
+                className="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-3 px-6 rounded-md transition-colors duration-200 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:ring-offset-gray-800"
+              >
+                Add Expense
+              </button>
+            </div>
+          </form>
+        </div>
+        
+        {/* Analytics Section */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          {/* Expenses by Category */}
+          <div className="bg-gray-800 rounded-lg p-4 md:p-6">
+            <h3 className="text-lg font-semibold text-white mb-4">Expenses by Category</h3>
+            <ExpensesByCategory />
           </div>
           
-          <button
-            type="submit"
-            className="w-full bg-blue-500 text-white py-2 px-4 rounded-md hover:bg-blue-600 transition"
-          >
-            Add Expense
-          </button>
-        </form>
-      </div>
-      
-      <div className="max-w-5xl mx-auto mt-6">
-        <div className="grid md:grid-cols-2 gap-6">
-          <div>
-            <ExpensesByCategory/>
-          </div>
-          <div className="">
+          {/* Expense History */}
+          <div className="bg-gray-800 rounded-lg p-4 md:p-6">
+            <h3 className="text-lg font-semibold text-white mb-4">Recent Expenses</h3>
             {user && user.id && <ExpenseHistory userId={user.id} />}
           </div>
         </div>

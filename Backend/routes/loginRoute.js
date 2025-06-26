@@ -1,7 +1,7 @@
 import express from 'express';
 import { LoginData } from '../models/userLogin.js'; 
 import { UserData } from '../models/UserData.js';
-import bcrypt from 'bcrypt'; 
+import bcryptjs from 'bcryptjs'; 
 import jwt from 'jsonwebtoken';
 import { jwtSecret } from '../config.js'; // Assuming you export jwtSecret from config.js
 
@@ -15,7 +15,7 @@ loginRoute.post('/signup', async (request, response) => {
       return response.status(400).send({ message: 'Enter all fields: Username, Email, and Password' });
     }
 
-    const hashedPassword = await bcrypt.hash(password, 10);
+    const hashedPassword = await bcryptjs.hash(password, 10);
 
     const newUser = new LoginData({ username, email, password: hashedPassword });
     await newUser.save();
@@ -69,7 +69,7 @@ loginRoute.post('/login', async (request, response) => {
       return response.status(404).send({ message: 'User not found' });
     }
 
-    const isMatch = await bcrypt.compare(password, user.password);
+    const isMatch = await bcryptjs.compare(password, user.password);
 
     if (!isMatch) {
       return response.status(401).send({ message: 'Invalid credentials' });
