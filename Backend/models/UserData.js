@@ -79,6 +79,9 @@ const UserDataSchema = new mongoose.Schema(
             type: Number,
             required: true,
         },
+        suggestions: {
+            type:String,
+        },
         
         expenses: [ExpenseSchema],
         income: [IncomeSchema], 
