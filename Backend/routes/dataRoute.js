@@ -616,6 +616,40 @@ dataRoute.put('/userdata/:userId/suggestion', async (req, res) => {
         res.status(500).json({ message: 'Error updating suggestion', error });
     }
 });
+// Update Savings Goal and current value
+app.put('/userdata/:userId/savings-goals/:goalId/update', async (req, res) => {
+    const { userId, goalId } = req.params;
+    const { goalName, targetAmount, currentAmount, deadline } = req.body;
+    const forbidden = checkOwnership(req, res, userId);
+    if (forbidden) return;
+
+    try {
+        const userData = await UserData.findOne({ userId });
+
+        if (!userData) {
+            return res.status(404).json({ message: 'User data not found' });
+        }
+
+        const goal = userData.savingsGoals.id(goalId);
+        if (!goal) {
+            return res.status(404).json({ message: 'Savings goal not found' });
+        }
+
+        if (goalName !== undefined) goal.goalName = goalName;
+        if (targetAmount !== undefined) goal.targetAmount = targetAmount;
+        if (deadline !== undefined) goal.deadline = deadline;
+
+        if (currentAmount !== undefined) {
+            goal.currentAmount = currentAmount; // Directly update the current value
+        }
+
+        await userData.save();
+        res.status(200).json({ message: 'Savings goal updated successfully', goal });
+    } catch (error) {
+        console.error('Error updating savings goal:', error);
+        res.status(500).json({ message: 'Error updating savings goal', error });
+    }
+});
 
 
 
