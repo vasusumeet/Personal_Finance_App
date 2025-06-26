@@ -6,7 +6,7 @@ import { Bar } from 'react-chartjs-2';
 
 ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend);
 
-const SavingsProgress = () => {
+const SavingHistory = () => {
   const { user } = useContext(UserContext);
   const [savingsData, setSavingsData] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -23,7 +23,7 @@ const SavingsProgress = () => {
           setLoading(false);
           return;
         }
-        const response = await axios.get(`https://miraculous-beauty-production.up.railway.app/api/userdata/${user.id}`, {
+        const response = await axios.get(`https://personalfinanceapp-production-3551.up.railway.app/api/userdata/${user.id}`, {
           headers: {
             Authorization: `Bearer ${token}`
           }
@@ -98,4 +98,4 @@ const SavingsProgress = () => {
   );
 };
 
-export default SavingsProgress;
+export default SavingHistory;
