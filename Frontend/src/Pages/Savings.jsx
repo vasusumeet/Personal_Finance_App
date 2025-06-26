@@ -6,6 +6,7 @@ import "react-datepicker/dist/react-datepicker.css";
 import { UserContext } from "../UserContext";
 import SavingsProgress from "../Components/savingsprog";
 import BudgetOverview from "../Components/budgetover";
+import SavingHistory from "../Components/savingshistory";
 
 const Savings = () => {
   const { user } = useContext(UserContext);
@@ -417,7 +418,10 @@ const Savings = () => {
               <h3 className="text-lg font-semibold text-white mb-4">Savings Progress</h3>
               <SavingsProgress />
             </div>
-            
+            <div className="bg-gray-800 rounded-lg p-4 md:p-6">
+              <h3 className="text-lg font-semibold text-white mb-4">Savings Progress</h3>
+              <SavingHistory />
+            </div>
             <div className="bg-gray-800 rounded-lg p-4 md:p-6">
               <h3 className="text-lg font-semibold text-white mb-4">Budget Overview</h3>
               <BudgetOverview />
