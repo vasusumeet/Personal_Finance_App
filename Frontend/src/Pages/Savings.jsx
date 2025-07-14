@@ -6,6 +6,7 @@ import "react-datepicker/dist/react-datepicker.css";
 import { UserContext } from "../UserContext";
 import SavingsProgress from "../Components/savingsprog";
 import BudgetOverview from "../Components/budgetover";
+import SavingHistory from "../Components/savingshistory";
 
 const Savings = () => {
   const { user } = useContext(UserContext);
@@ -33,7 +34,7 @@ const Savings = () => {
       try {
         setLoading(true);
         const response = await axios.get(
-          `https://personalfinanceapp-production-3551.up.railway.app/api/userdata/${user.id}`,
+          `https://miraculous-beauty-production.up.railway.app/api/userdata/${user.id}`,
           { headers: getAuthHeader() }
         );
         const userData = response.data;
@@ -67,7 +68,7 @@ const Savings = () => {
     
     try {
       const response = await axios.post(
-        `https://personalfinanceapp-production-3551.up.railway.app/api/userdata/${user.id}/savings-goals`, 
+        `https://miraculous-beauty-production.up.railway.app/api/userdata/${user.id}/savings-goals`, 
         {
           goalName: formData.goalName,
           targetAmount: parseFloat(formData.targetAmount),
@@ -99,7 +100,7 @@ const Savings = () => {
     
     try {
       const response = await axios.delete(
-        `https://personalfinanceapp-production-3551.up.railway.app/api/userdata/${user.id}/savings-goals/${goalId}`,
+        `https://miraculous-beauty-production.up.railway.app/api/userdata/${user.id}/savings-goals/${goalId}`,
         { headers: getAuthHeader() }
       );
       setSavingsGoals(response.data.savingsGoals);
@@ -417,7 +418,10 @@ const Savings = () => {
               <h3 className="text-lg font-semibold text-white mb-4">Savings Progress</h3>
               <SavingsProgress />
             </div>
-            
+            <div className="bg-gray-800 rounded-lg p-4 md:p-6">
+              <h3 className="text-lg font-semibold text-white mb-4">Savings Progress</h3>
+              <SavingHistory />
+            </div>
             <div className="bg-gray-800 rounded-lg p-4 md:p-6">
               <h3 className="text-lg font-semibold text-white mb-4">Budget Overview</h3>
               <BudgetOverview />

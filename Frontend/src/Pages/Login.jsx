@@ -26,7 +26,7 @@ const Login = () => {
     }
 
     try {
-      const response = await fetch('https://personalfinanceapp-production-3551.up.railway.app/api/auth/login', {
+      const response = await fetch('https://miraculous-beauty-production.up.railway.app/api/auth/login', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

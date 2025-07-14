@@ -13,6 +13,10 @@ const ExpenseSchema = new mongoose.Schema({
         type: Date,
         default: Date.now,
     },
+    paymentMethod: {
+        type: String,
+        required: true,
+    },
     category: {
         type: String,
         required: true,
@@ -74,6 +78,9 @@ const UserDataSchema = new mongoose.Schema(
         recurringSalary: {
             type: Number,
             required: true,
+        },
+        suggestions: {
+            type:String,
         },
         
         expenses: [ExpenseSchema],
